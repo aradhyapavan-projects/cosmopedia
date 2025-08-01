@@ -1,0 +1,1106 @@
+{% extends "base.html" %}
+
+{% block title %}Space Terminologies - Cosmopedia{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .alphabet-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .alphabet-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #0066cc;
+            background: transparent;
+            color: #0066cc;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .alphabet-btn:hover {
+            background: #0066cc;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
+        }
+        
+        .alphabet-btn.active {
+            background: #ff6b35;
+            border-color: #ff6b35;
+            color: white;
+        }
+        
+        .alphabet-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .alphabet-btn .count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffd23f;
+            color: #000000 !important;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            font-weight: 700 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+            z-index: 1;
+            font-weight: bold;
+        }
+        
+        .term-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .term-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.25);
+            border-color: #0066cc;
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .term-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #0066cc, #ff6b35);
+        }
+        
+        .term-title {
+            color: #ffd23f;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+        
+        .term-category {
+            display: inline-block;
+            background: rgba(255, 107, 53, 0.2);
+            color: #ff6b35;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .term-description {
+            color: #e8e8e8;
+            line-height: 1.4;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+        }
+        
+        .term-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: auto;
+        }
+        
+        .term-meta .term-id {
+            opacity: 0.7;
+            font-weight: 500;
+        }
+        
+        .term-meta .term-icon {
+            color: #0066cc;
+        }
+        
+        .search-controls {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .search-input::placeholder {
+            color: #999;
+        }
+        
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .category-checkbox {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .category-checkbox:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #0066cc;
+            transform: translateY(-1px);
+        }
+        
+        .category-checkbox.active {
+            background: linear-gradient(135deg, #0066cc, #0080ff);
+            border-color: #0066cc;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        }
+        
+        .category-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+            accent-color: #ffd23f;
+            border-radius: 3px;
+        }
+        
+        .category-checkbox label {
+            color: #e8e8e8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0;
+            transition: color 0.3s ease;
+        }
+        
+        .category-checkbox.active label {
+            color: white;
+        }
+        
+        .category-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        
+        .category-dropdown-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-dropdown-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #0066cc;
+        }
+        
+        .category-dropdown-toggle.active {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .category-dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 26, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .category-dropdown-content.show {
+            display: block;
+        }
+        
+        .category-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        
+        .category-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .category-item.selected {
+            background: rgba(0, 102, 204, 0.2);
+            color: #66b3ff;
+        }
+        
+        .category-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            accent-color: #0066cc;
+        }
+        
+        .category-item label {
+            color: #e8e8e8;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .category-item.selected label {
+            color: #66b3ff;
+            font-weight: 500;
+        }
+        
+        .selected-count {
+            background: #0066cc;
+            color: white;
+            border-radius: 12px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .results-info {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #555;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+        
+        .loading .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #0066cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .terminology-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .terminology-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0066cc, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .terminology-header p {
+            font-size: 1.2rem;
+            color: #999;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            background: rgba(26, 26, 26, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-title {
+            color: #ffd23f;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            color: #e8e8e8;
+        }
+        
+        .modal-category {
+            background: rgba(255, 107, 53, 0.2);
+            color: #ff6b35;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-details {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-details h6 {
+            color: #0066cc;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .fun-fact {
+            background: rgba(255, 210, 63, 0.1);
+            border-left: 4px solid #ffd23f;
+        }
+        
+        .fun-fact h6 {
+            color: #ffd23f !important;
+        }
+        
+        .related-terms .badge {
+            background: rgba(0, 102, 204, 0.2) !important;
+            color: #66b3ff !important;
+            border: 1px solid #0066cc;
+        }
+        
+        .load-more-btn {
+            background: linear-gradient(135deg, #0066cc, #0080ff);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+            background: linear-gradient(135deg, #0080ff, #0066cc);
+        }
+        
+        .load-more-btn .badge {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+        
+        .no-results {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: #999;
+        }
+        
+        .no-results h3 {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-close {
+            filter: invert(1);
+        }
+        
+        .back-to-home {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            background: rgba(0, 102, 204, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .back-to-home:hover {
+            background: rgba(0, 102, 204, 1);
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .terminology-header h1 {
+                font-size: 2rem;
+            }
+            
+            .back-to-home {
+                top: 80px;
+                left: 10px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Back to Home Button -->
+    <button class="back-to-home" onclick="window.location.href='/'">
+        <i class="fas fa-home"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="container mt-5 pt-5">
+        <!-- Header -->
+        <div class="terminology-header">
+            <h1><i class="fas fa-book-open me-3"></i>Space Terminologies</h1>
+            <p>Explore and discover space-related terms, definitions, and concepts from astronomy, space technology, and exploration</p>
+        </div>
+
+        <!-- Search and Filter Controls -->
+        <div class="search-controls">
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search terminologies...">
+                </div>
+                <div class="col-md-6">
+                    <div class="category-dropdown">
+                        <div class="category-dropdown-toggle" id="categoryToggle">
+                            <span id="categoryToggleText">All Categories</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-dropdown-content" id="categoryDropdown">
+                            <!-- Categories will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selected Categories Display -->
+            <div class="category-filter" id="selectedCategories" style="display: none;">
+                <!-- Selected categories will be displayed here -->
+            </div>
+            
+            <!-- Alphabet Filter -->
+            <div class="alphabet-filter" id="alphabetFilter">
+                <!-- Alphabet buttons will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="results-info" id="resultsInfo">
+            Loading terminologies...
+        </div>
+
+        <!-- Terms Grid -->
+        <div class="row" id="termsGrid">
+            <!-- Loading indicator -->
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading space terminologies...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Term Detail Modal -->
+    <div class="modal fade" id="termModal" tabindex="-1" aria-labelledby="termModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termModalLabel">Term Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="termModalBody">
+                    <!-- Modal content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        // Global variables
+        let allTerms = [];
+        let filteredTerms = [];
+        let displayedTerms = [];
+        let currentFilter = {
+            search: '',
+            categories: [], // Changed from single category to array
+            letter: ''
+        };
+        let alphabetStats = {};
+        let currentPage = 1;
+        let allCategories = [];
+        const termsPerPage = 20; // Show 20 terms at a time
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAlphabetStats();
+            loadCategories();
+            loadTerms();
+            setupEventListeners();
+        });
+
+        // Load alphabet statistics
+        async function loadAlphabetStats() {
+            try {
+                const response = await fetch('/api/alphabet');
+                alphabetStats = await response.json();
+                renderAlphabetFilter();
+            } catch (error) {
+                console.error('Error loading alphabet stats:', error);
+            }
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                allCategories = await response.json();
+                
+                const categoryDropdown = document.getElementById('categoryDropdown');
+                categoryDropdown.innerHTML = '';
+                
+                // Add "All Categories" option
+                const allItem = document.createElement('div');
+                allItem.className = 'category-item';
+                allItem.innerHTML = `
+                    <input type="checkbox" id="category-all" onchange="toggleAllCategories(this)">
+                    <label for="category-all">All Categories</label>
+                `;
+                categoryDropdown.appendChild(allItem);
+                
+                // Add separator
+                const separator = document.createElement('div');
+                separator.style.borderTop = '1px solid rgba(255, 255, 255, 0.1)';
+                separator.style.margin = '0.5rem 0';
+                categoryDropdown.appendChild(separator);
+                
+                // Add individual categories
+                allCategories.forEach((category, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'category-item';
+                    item.innerHTML = `
+                        <input type="checkbox" id="category-${index}" value="${category}" onchange="toggleCategory('${category}')">
+                        <label for="category-${index}">${category}</label>
+                    `;
+                    categoryDropdown.appendChild(item);
+                });
+                
+                updateCategoryToggleText();
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Load terms
+        async function loadTerms() {
+            try {
+                // Reset pagination when loading new terms
+                currentPage = 1;
+                
+                const queryParams = new URLSearchParams();
+                if (currentFilter.search) queryParams.append('search', currentFilter.search);
+                if (currentFilter.letter) queryParams.append('letter', currentFilter.letter);
+                
+                const response = await fetch(`/api/terms?${queryParams}`);
+                allTerms = await response.json();
+                
+                // Apply category filter client-side
+                filteredTerms = currentFilter.categories.length > 0 ? 
+                    allTerms.filter(term => currentFilter.categories.includes(term.category)) : 
+                    allTerms;
+                
+                renderTerms();
+                updateResultsInfo();
+            } catch (error) {
+                console.error('Error loading terms:', error);
+                showError('Failed to load terms. Please try again.');
+            }
+        }
+
+        // Render alphabet filter
+        function renderAlphabetFilter() {
+            const container = document.getElementById('alphabetFilter');
+            container.innerHTML = '';
+            
+            // Add "All" button
+            const allBtn = document.createElement('button');
+            allBtn.className = 'alphabet-btn' + (currentFilter.letter === '' ? ' active' : '');
+            allBtn.textContent = 'All';
+            allBtn.onclick = () => filterByLetter('');
+            container.appendChild(allBtn);
+            
+            // Add alphabet buttons
+            for (let i = 65; i <= 90; i++) {
+                const letter = String.fromCharCode(i);
+                const count = alphabetStats[letter] || 0;
+                
+                const btn = document.createElement('button');
+                btn.className = 'alphabet-btn' + 
+                    (currentFilter.letter === letter ? ' active' : '') +
+                    (count === 0 ? ' disabled' : '');
+                btn.textContent = letter;
+                btn.disabled = count === 0;
+                
+                if (count > 0) {
+                    const countSpan = document.createElement('span');
+                    countSpan.className = 'count';
+                    countSpan.textContent = count;
+                    btn.appendChild(countSpan);
+                    
+                    btn.onclick = () => filterByLetter(letter);
+                }
+                
+                container.appendChild(btn);
+            }
+        }
+
+        // Render terms with pagination
+        function renderTerms() {
+            const grid = document.getElementById('termsGrid');
+            
+            if (filteredTerms.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-12">
+                        <div class="no-results text-center py-5">
+                            <i class="fas fa-search fa-3x mb-3" style="color: #666;"></i>
+                            <h3>No terminologies found</h3>
+                            <p>Try adjusting your search criteria or filters.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Reset pagination when filter changes
+            const termsToShow = currentPage * termsPerPage;
+            displayedTerms = filteredTerms.slice(0, termsToShow);
+            
+            grid.innerHTML = '';
+            
+            // Render displayed terms
+            displayedTerms.forEach(term => {
+                const col = document.createElement('div');
+                col.className = 'col-lg-3 col-md-4 col-sm-6 mb-3';
+                
+                col.innerHTML = `
+                    <div class="term-card" onclick="showTermDetails('${term.id}')">
+                        <div class="term-category">${term.category}</div>
+                        <h3 class="term-title">${term.term}</h3>
+                        <p class="term-description">${term.short_description}</p>
+                        <div class="term-meta">
+                            <span class="term-id">#${term.id}</span>
+                            <span class="term-icon"><i class="fas fa-chevron-right"></i></span>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(col);
+            });
+            
+            // Add Load More button if there are more terms to show
+            if (displayedTerms.length < filteredTerms.length) {
+                const loadMoreCol = document.createElement('div');
+                loadMoreCol.className = 'col-12 text-center mt-4';
+                loadMoreCol.innerHTML = `
+                    <button class="btn btn-primary btn-lg load-more-btn" onclick="loadMoreTerms()">
+                        <i class="fas fa-plus me-2"></i>Load More 
+                        <span class="badge bg-light text-dark ms-2">${filteredTerms.length - displayedTerms.length} remaining</span>
+                    </button>
+                `;
+                grid.appendChild(loadMoreCol);
+            }
+        }
+        
+        // Load more terms function
+        function loadMoreTerms() {
+            currentPage++;
+            renderTerms();
+            updateResultsInfo();
+            
+            // Smooth scroll to show new content
+            setTimeout(() => {
+                const lastCards = document.querySelectorAll('.term-card');
+                if (lastCards.length > 0) {
+                    const scrollTarget = lastCards[Math.max(0, lastCards.length - termsPerPage)];
+                    scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+
+        // Update results info
+        function updateResultsInfo() {
+            const info = document.getElementById('resultsInfo');
+            const total = allTerms.length;
+            const filtered = filteredTerms.length;
+            const displayed = displayedTerms.length;
+            
+            if (filtered === 0) {
+                info.textContent = 'No terminologies found';
+            } else if (filtered === total && displayed === filtered) {
+                info.textContent = `Showing all ${total} terminologies`;
+            } else if (displayed === filtered) {
+                info.textContent = `Showing all ${filtered} of ${total} terminologies`;
+            } else {
+                info.textContent = `Showing ${displayed} of ${filtered} terminologies (${total} total)`;
+            }
+        }
+
+        // Filter by letter
+        function filterByLetter(letter) {
+            currentFilter.letter = letter;
+            loadTerms();
+            renderAlphabetFilter();
+        }
+
+        // Show term details
+        async function showTermDetails(termId) {
+            try {
+                const response = await fetch(`/api/terms/${termId}`);
+                const term = await response.json();
+                
+                const modalBody = document.getElementById('termModalBody');
+                modalBody.innerHTML = `
+                    <div class="modal-category">${term.category}</div>
+                    <h3 class="modal-title">${term.term}</h3>
+                    
+                    ${term.image_url ? `
+                        <div class="text-center">
+                            <img src="${term.image_url}" alt="${term.term}" class="modal-image" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300/1a1a2e/ffd23f?text=No+Image+Available';">
+                        </div>
+                    ` : ''}
+                    
+                    <div class="modal-description">${term.detailed_description}</div>
+                    
+                    ${term.related_terms && term.related_terms.length > 0 ? `
+                        <div class="modal-details">
+                            <h6><i class="fas fa-link me-2"></i>Related Terms</h6>
+                            <div class="related-terms">
+                                ${term.related_terms.map(relatedTerm => `
+                                    <span class="badge bg-secondary me-1 mb-1">${relatedTerm}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${term.fun_fact ? `
+                        <div class="modal-details fun-fact">
+                            <h6><i class="fas fa-lightbulb me-2"></i>Fun Fact</h6>
+                            <p><em>${term.fun_fact}</em></p>
+                        </div>
+                    ` : ''}
+                    
+                    ${term.etymology ? `
+                        <div class="modal-details">
+                            <h6><i class="fas fa-book me-2"></i>Etymology</h6>
+                            <p>${term.etymology}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${term.example_usage ? `
+                        <div class="modal-details">
+                            <h6><i class="fas fa-quote-left me-2"></i>Example Usage</h6>
+                            <p><em>"${term.example_usage}"</em></p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="modal-details">
+                        <h6><i class="fas fa-info-circle me-2"></i>Quick Info</h6>
+                        <p><strong>ID:</strong> ${term.id}</p>
+                        <p><strong>Category:</strong> ${term.category}</p>
+                        <p><strong>Short Description:</strong> ${term.short_description}</p>
+                    </div>
+                `;
+                
+                const modal = new bootstrap.Modal(document.getElementById('termModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Error loading term details:', error);
+                alert('Failed to load term details. Please try again.');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentFilter.search = this.value.trim();
+                    loadTerms();
+                }, 300);
+            });
+            
+            // Category dropdown toggle
+            const categoryToggle = document.getElementById('categoryToggle');
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            
+            categoryToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                categoryDropdown.classList.toggle('show');
+                categoryToggle.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!categoryToggle.contains(e.target) && !categoryDropdown.contains(e.target)) {
+                    categoryDropdown.classList.remove('show');
+                    categoryToggle.classList.remove('active');
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside
+            categoryDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+        
+        // Toggle individual category
+        function toggleCategory(category) {
+            const index = currentFilter.categories.indexOf(category);
+            if (index > -1) {
+                currentFilter.categories.splice(index, 1);
+            } else {
+                currentFilter.categories.push(category);
+            }
+            
+            updateCategoryDisplay();
+            updateCategoryToggleText();
+            updateAllCategoriesCheckbox();
+            loadTerms();
+        }
+        
+        // Toggle all categories
+        function toggleAllCategories(checkbox) {
+            if (checkbox.checked) {
+                currentFilter.categories = [...allCategories];
+                // Check all individual checkboxes
+                allCategories.forEach((category, index) => {
+                    const categoryCheckbox = document.getElementById(`category-${index}`);
+                    if (categoryCheckbox) categoryCheckbox.checked = true;
+                });
+            } else {
+                currentFilter.categories = [];
+                // Uncheck all individual checkboxes
+                allCategories.forEach((category, index) => {
+                    const categoryCheckbox = document.getElementById(`category-${index}`);
+                    if (categoryCheckbox) categoryCheckbox.checked = false;
+                });
+            }
+            
+            updateCategoryDisplay();
+            updateCategoryToggleText();
+            loadTerms();
+        }
+        
+        // Update the "All Categories" checkbox state
+        function updateAllCategoriesCheckbox() {
+            const allCheckbox = document.getElementById('category-all');
+            if (allCheckbox) {
+                allCheckbox.checked = currentFilter.categories.length === allCategories.length;
+                allCheckbox.indeterminate = currentFilter.categories.length > 0 && currentFilter.categories.length < allCategories.length;
+            }
+        }
+        
+        // Update category toggle text
+        function updateCategoryToggleText() {
+            const toggleText = document.getElementById('categoryToggleText');
+            const selectedCount = currentFilter.categories.length;
+            
+            if (selectedCount === 0) {
+                toggleText.innerHTML = 'All Categories';
+            } else if (selectedCount === 1) {
+                toggleText.innerHTML = `${currentFilter.categories[0]} <span class="selected-count">1</span>`;
+            } else if (selectedCount === allCategories.length) {
+                toggleText.innerHTML = `All Categories <span class="selected-count">${selectedCount}</span>`;
+            } else {
+                toggleText.innerHTML = `Multiple Categories <span class="selected-count">${selectedCount}</span>`;
+            }
+            
+            // Update checkbox states in dropdown
+            allCategories.forEach((category, index) => {
+                const checkbox = document.getElementById(`category-${index}`);
+                const item = checkbox?.closest('.category-item');
+                if (checkbox && item) {
+                    checkbox.checked = currentFilter.categories.includes(category);
+                    item.classList.toggle('selected', checkbox.checked);
+                }
+            });
+        }
+        
+        // Update selected categories display
+        function updateCategoryDisplay() {
+            const container = document.getElementById('selectedCategories');
+            
+            if (currentFilter.categories.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'flex';
+            container.innerHTML = '';
+            
+            // Add label
+            const label = document.createElement('div');
+            label.style.color = '#999';
+            label.style.fontSize = '0.9rem';
+            label.style.fontWeight = '500';
+            label.style.marginRight = '12px';
+            label.style.alignSelf = 'center';
+            label.textContent = 'Filtered by:';
+            container.appendChild(label);
+            
+            // Add selected categories as badges
+            currentFilter.categories.forEach(category => {
+                const badge = document.createElement('div');
+                badge.className = 'category-checkbox active';
+                badge.innerHTML = `
+                    <span>${category}</span>
+                    <button onclick="removeCategory('${category}')" style="
+                        background: none; 
+                        border: none; 
+                        color: white; 
+                        margin-left: 8px; 
+                        cursor: pointer;
+                        font-size: 1.1rem;
+                        line-height: 1;
+                        padding: 0;
+                    ">&times;</button>
+                `;
+                container.appendChild(badge);
+            });
+        }
+        
+        // Remove category from selection
+        function removeCategory(category) {
+            toggleCategory(category);
+        }
+
+        // Show error message
+        function showError(message) {
+            const grid = document.getElementById('termsGrid');
+            grid.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    </script>
+{% endblock %}

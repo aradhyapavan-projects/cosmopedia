@@ -1,0 +1,1404 @@
+{% extends "base.html" %}
+
+{% block title %}Space Images - Cosmopedia{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Source Cards */
+.source-card {
+    transition: all 0.3s ease;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    cursor: pointer;
+    height: 180px;
+}
+
+.source-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 102, 204, 0.3);
+}
+
+.source-card .card-body {
+    padding: 2rem;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.source-logo {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #0066cc;
+}
+
+.source-card:hover .source-logo {
+    color: #00ffff;
+}
+
+.source-card .card-title {
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.source-card .card-text {
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+/* Coming Soon cards */
+.source-card[style*="opacity: 0.6"] {
+    cursor: pointer !important;
+    position: relative;
+}
+
+.source-card[style*="opacity: 0.6"]:hover {
+    opacity: 0.8 !important;
+    transform: translateY(-5px);
+}
+
+.source-card[style*="opacity: 0.6"]::after {
+    content: "Coming Soon";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 193, 7, 0.9);
+    color: #000;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* Search Controls */
+.search-controls {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2.5rem;
+}
+
+.search-controls .form-label {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.search-controls .form-control,
+.search-controls .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 10px;
+}
+
+.search-controls .form-control:focus,
+.search-controls .form-select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #0066cc;
+    box-shadow: 0 0 10px rgba(0, 102, 204, 0.3);
+}
+
+.search-controls .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-controls .form-select option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+/* Source Cards Section */
+.source-cards-header {
+    margin-bottom: 1.5rem;
+}
+
+.source-cards-section {
+    margin-bottom: 3rem;
+}
+
+/* Results Section */
+.results-section {
+    min-height: 400px;
+}
+
+/* Image Cards */
+.image-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
+}
+
+.image-preview-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.image-preview-container img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: zoom-in;
+}
+
+.image-preview-container:hover img {
+    transform: scale(1.05);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-preview-container:hover .image-overlay {
+    opacity: 1;
+}
+
+.image-overlay .btn {
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-card .card-body {
+    padding: 1.5rem;
+}
+
+.image-card .card-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.image-card .card-text {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.image-meta {
+    font-size: 0.8rem;
+}
+
+.image-meta small {
+    color: #999;
+}
+
+.badge {
+    background: rgba(0, 102, 204, 0.2);
+    color: #00ffff;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    font-size: 0.7rem;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+/* No Results */
+.no-results {
+    color: #ccc;
+}
+
+.no-results i {
+    font-size: 3rem;
+    color: #666;
+}
+
+/* Modal Enhancements */
+.modal-content {
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-title {
+    color: #fff;
+}
+
+.zoom-container {
+    overflow: hidden;
+    border-radius: 10px;
+    background: #000;
+    position: relative;
+}
+
+.zoom-container img {
+    transition: transform 0.3s ease;
+    cursor: zoom-in;
+    max-width: 100%;
+    height: auto;
+}
+
+.zoom-container.zoomed img {
+    cursor: grab;
+}
+
+.zoom-container.zoomed img:active {
+    cursor: grabbing;
+}
+
+.image-controls .btn {
+    border-radius: 10px;
+}
+
+#modalImageDetails {
+    color: #ccc;
+}
+
+#modalImageDetails h6 {
+    color: #0066cc;
+    margin-bottom: 0.5rem;
+}
+
+.keyword-tag {
+    display: inline-block;
+    background: rgba(0, 102, 204, 0.2);
+    color: #00ffff;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Maximized Modal */
+.modal.maximized .modal-dialog {
+    max-width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+.modal.maximized .modal-content {
+    height: 100vh;
+    border-radius: 0;
+}
+
+.modal.maximized .modal-body {
+    padding: 1rem;
+}
+
+.modal.maximized .zoom-container {
+    border-radius: 0;
+    height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.maximized .zoom-container img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Pagination */
+.pagination .page-link {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 10px;
+    margin: 0 0.25rem;
+}
+
+.pagination .page-link:hover {
+    background: rgba(0, 102, 204, 0.2);
+    border-color: #0066cc;
+    color: #00ffff;
+}
+
+.pagination .page-item.active .page-link {
+    background: #0066cc;
+    border-color: #0066cc;
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+    color: #666;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .source-card {
+        height: 160px;
+        margin-bottom: 1rem;
+    }
+    
+    .source-logo {
+        font-size: 2.5rem;
+    }
+    
+    .search-controls {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .source-cards-section {
+        margin-bottom: 3rem;
+    }
+    
+    .image-card img {
+        height: 150px;
+    }
+    
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .image-controls .btn {
+        margin-bottom: 0.5rem;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+    
+    .modal.maximized .modal-dialog {
+        margin: 0;
+    }
+    
+    .modal.maximized .zoom-container {
+        height: calc(100vh - 150px);
+    }
+}
+
+@media (max-width: 576px) {
+    .source-card .card-title {
+        font-size: 1.2rem;
+    }
+    
+    .source-card .card-text {
+        font-size: 0.8rem;
+    }
+    
+    .source-logo {
+        font-size: 2rem;
+    }
+    
+    .image-controls .btn {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-top: 5rem; padding-bottom: 2rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1><i class="fas fa-images me-3"></i>Space Images</h1>
+                <p class="lead" style="margin-top: 1rem;">Explore stunning space images from multiple sources and discover the wonders of our universe</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Search Controls (Always Visible) - Now Above Sources -->
+    <div class="search-controls">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="searchInput" class="form-label">Search Images</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search for space images...">
+            </div>
+            <div class="col-md-3">
+                <label for="yearFilter" class="form-label">Year</label>
+                <select class="form-select" id="yearFilter">
+                    <option value="">All Years</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="sourceFilter" class="form-label">Source</label>
+                <select class="form-select" id="sourceFilter">
+                    <option value="">All Sources</option>
+                    <option value="NASA">NASA</option>
+                    <option value="ESA">ESA</option>
+                    <option value="SpaceX">SpaceX</option>
+                    <option value="Wallpapers">Wallpapers</option>
+                    <option value="Public">Public Sources</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button class="btn btn-primary" onclick="searchImages()">
+                        <i class="fas fa-search me-1"></i>Search
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <button class="btn btn-outline-secondary btn-sm" onclick="clearFilters()">
+                    <i class="fas fa-times me-1"></i>Clear All Filters
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Source Selection Cards -->
+    <div class="source-cards-section">
+        <div class="row mb-4 source-cards-header">
+            <div class="col-12">
+                <h3 class="mb-3 text-center text-white">
+                    <i class="fas fa-satellite-dish me-2"></i>Browse by Source
+                </h3>
+                <p class="text-center text-muted mb-0">Click on a source card to filter images by that source</p>
+            </div>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <!-- NASA -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card source-card" onclick="selectSource('NASA')">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h5 class="card-title">NASA</h5>
+                        <p class="card-text">National Aeronautics and Space Administration</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ESA -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card source-card" onclick="selectSource('ESA')" style="opacity: 0.6;" title="Coming soon">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-globe-europe"></i>
+                        </div>
+                        <h5 class="card-title">ESA</h5>
+                        <p class="card-text">European Space Agency (Coming Soon)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SpaceX -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card source-card" onclick="selectSource('SpaceX')" style="opacity: 0.6;" title="Coming soon">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-satellite"></i>
+                        </div>
+                        <h5 class="card-title">SpaceX</h5>
+                        <p class="card-text">Private Space Exploration (Coming Soon)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wallpapers -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card source-card" onclick="selectSource('Wallpapers')" style="opacity: 0.6;" title="Coming soon">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <h5 class="card-title">Wallpapers</h5>
+                        <p class="card-text">High-Quality Backgrounds (Coming Soon)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Public Sources -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card source-card" onclick="selectSource('Public')" style="opacity: 0.6;" title="Coming soon">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5 class="card-title">Public Sources</h5>
+                        <p class="card-text">Community Contributions (Coming Soon)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div id="resultsCount" class="text-muted">Click search to load images...</div>
+            <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Images Grid -->
+        <div id="imagesGrid" class="row g-4" style="display: none;">
+            <!-- Images will be loaded here dynamically -->
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="text-center py-5" style="display: none;">
+            <div class="no-results">
+                <i class="fas fa-search mb-3"></i>
+                <h5>No images found</h5>
+                <p class="text-muted">Try adjusting your search criteria or filters</p>
+                <button class="btn btn-outline-primary" onclick="clearFilters()">
+                    <i class="fas fa-times me-1"></i>Clear Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationWrapper" class="d-flex justify-content-center mt-4" style="display: none;">
+            <nav aria-label="Image pagination">
+                <ul id="pagination" class="pagination">
+                    <!-- Pagination will be generated dynamically -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalTitle">Image Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="zoom-container" id="imageZoomContainer">
+                            <img id="modalImage" src="" alt="" class="img-fluid">
+                        </div>
+                        <div class="image-controls mt-3">
+                            <button class="btn btn-outline-primary me-2" id="zoomBtn" onclick="console.log('Zoom button clicked'); toggleZoom();" title="Zoom In/Out (Z)">
+                                <i class="fas fa-search-plus me-1"></i>Zoom In
+                            </button>
+                            <button class="btn btn-outline-info me-2" id="maximizeBtn" onclick="console.log('Maximize button clicked'); toggleMaximize();" title="Maximize/Minimize (M)">
+                                <i class="fas fa-expand me-1"></i>Maximize
+                            </button>
+                            <button class="btn btn-outline-success me-2" onclick="console.log('Download button clicked'); downloadImage();" title="Download Image (D)">
+                                <i class="fas fa-download me-1"></i>Download
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="console.log('Share button clicked'); shareImage();" title="Share Image (S)">
+                                <i class="fas fa-share me-1"></i>Share
+                            </button>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-keyboard me-1"></i>
+                                Keyboard shortcuts: Z (zoom), M (maximize), D (download), S (share)
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div id="modalImageDetails" style="padding: 1rem;">
+                            <!-- Image details will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+// Global variables
+let currentPage = 1;
+let totalPages = 1;
+let currentQuery = '';
+let currentYear = '';
+let currentSource = '';
+let currentImageUrl = '';
+let isZoomed = false;
+let isMaximized = false;
+let panX = 0;
+let panY = 0;
+
+// Select source function
+function selectSource(source) {
+    // For now, only NASA is supported
+    if (source === 'NASA') {
+        currentSource = source;
+        document.getElementById('sourceFilter').value = source;
+        searchImages();
+    } else {
+        // Show message for other sources
+        showToast(`${source} images coming soon! Currently only NASA images are available.`, 'info');
+    }
+}
+
+// Search function
+function searchImages() {
+    currentPage = 1;
+    currentQuery = document.getElementById('searchInput').value.trim();
+    currentYear = document.getElementById('yearFilter').value;
+    currentSource = document.getElementById('sourceFilter').value;
+    loadImages();
+}
+
+// Clear filters
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('yearFilter').value = '';
+    document.getElementById('sourceFilter').value = '';
+    currentPage = 1;
+    currentQuery = '';
+    currentYear = '';
+    currentSource = '';
+    document.getElementById('resultsCount').textContent = 'Click search to load images...';
+    document.getElementById('imagesGrid').innerHTML = '';
+    document.getElementById('imagesGrid').style.display = 'none';
+    document.getElementById('paginationWrapper').style.display = 'none';
+    document.getElementById('noResults').style.display = 'none';
+}
+
+// Load images from API
+async function loadImages() {
+    showLoading();
+    
+    try {
+        const params = new URLSearchParams({
+            page: currentPage,
+            page_size: 20
+        });
+        
+        if (currentQuery) params.append('search', currentQuery);
+        if (currentYear) params.append('year', currentYear);
+        
+        const response = await fetch(`/api/images?${params}`);
+        const data = await response.json();
+        
+        hideLoading();
+        
+        if (data.items && data.items.length > 0) {
+            displayImages(data.items);
+            updateResultsCount(data.total);
+            updatePagination(data.total);
+            hideNoResults();
+        } else {
+            showNoResults();
+            hideImagesGrid();
+        }
+    } catch (error) {
+        console.error('Error loading images:', error);
+        hideLoading();
+        showNoResults();
+    }
+}
+
+// Display images in grid
+function displayImages(images) {
+    const grid = document.getElementById('imagesGrid');
+    grid.innerHTML = '';
+    
+    images.forEach(image => {
+        const imageCard = createImageCard(image);
+        grid.appendChild(imageCard);
+    });
+    
+    document.getElementById('imagesGrid').style.display = 'flex';
+    
+    // Reinitialize image previewer for new images
+    setTimeout(() => {
+        reinitializeImagePreviewer();
+    }, 100);
+}
+
+// Create image card
+function createImageCard(image) {
+    const col = document.createElement('div');
+    col.className = 'col-md-6 col-lg-4';
+    
+    const formattedDate = image.date_created ? new Date(image.date_created).toLocaleDateString() : 'Unknown';
+    
+    col.innerHTML = `
+        <div class="card h-100 image-card">
+            <div class="image-preview-container">
+                <img src="${image.thumbnail}" alt="${escapeHtml(image.title)}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+                <div class="image-overlay">
+                    <button class="btn btn-primary btn-sm me-2" onclick="event.stopPropagation(); downloadImageDirect('${image.thumbnail}', '${escapeHtml(image.title)}')" title="Download Image">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn btn-info btn-sm" onclick="event.stopPropagation(); showImageModal('${image.nasa_id}', '${escapeHtml(image.title)}', '${escapeHtml(image.description)}', '${image.thumbnail}', '${formattedDate}', '${image.center}', '${image.photographer}', '${image.location}', '${JSON.stringify(image.keywords).replace(/'/g, "&#39;")}')" title="View Details">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">${escapeHtml(image.title)}</h5>
+                <p class="card-text">${escapeHtml(image.description.substring(0, 100))}${image.description.length > 100 ? '...' : ''}</p>
+                <div class="image-meta">
+                    <div class="mb-2">
+                        <small><i class="fas fa-calendar me-1"></i>${formattedDate}</small>
+                        ${image.center ? `<small class="ms-2"><i class="fas fa-building me-1"></i>${image.center}</small>` : ''}
+                    </div>
+                    <div>
+                        ${image.keywords.slice(0, 3).map(keyword => `<span class="badge">${keyword}</span>`).join('')}
+                        ${image.keywords.length > 3 ? `<span class="badge">+${image.keywords.length - 3} more</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return col;
+}
+
+// Enhanced image modal with zoom and download
+function showImageModal(nasaId, title, description, thumbnail, date, center, photographer, location, keywords) {
+    // Set current image URL
+    currentImageUrl = thumbnail;
+    
+    // Reset all states
+    isZoomed = false;
+    isMaximized = false;
+    panX = 0;
+    panY = 0;
+    
+    // Set modal title and image
+    document.getElementById('imageModalTitle').textContent = title;
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = thumbnail;
+    modalImage.alt = title;
+    
+    // Reset modal and image states using jQuery
+    const modal = $('#imageModal');
+    const modalDialog = modal.find('.modal-dialog');
+    
+    modal.removeClass('maximized');
+    modalDialog.css({
+        'max-width': '',
+        'height': '',
+        'margin': ''
+    });
+    
+    $('#imageZoomContainer').removeClass('zoomed');
+    $(modalImage).css({
+        'transform': 'scale(1)',
+        'cursor': 'zoom-in',
+        'transition': 'transform 0.3s ease'
+    });
+    
+    // Reset button states
+    $('#zoomBtn').html('<i class="fas fa-search-plus me-1"></i>Zoom In');
+    $('#maximizeBtn').html('<i class="fas fa-expand me-1"></i>Maximize');
+    
+    // Remove any existing event handlers
+    $(modalImage).off('mousedown.zoom mousemove.zoom mouseup.zoom mouseleave.zoom');
+    $(document).off('mousemove.zoom mouseup.zoom');
+    
+    const keywordsArray = JSON.parse(keywords);
+    const keywordTags = keywordsArray.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('');
+    
+    document.getElementById('modalImageDetails').innerHTML = `
+        <h6 class="text-primary">Description</h6>
+        <p class="text-muted mb-3">${description}</p>
+        
+        <h6 class="text-primary">Details</h6>
+        <ul class="list-unstyled mb-3">
+            <li class="mb-1"><strong>NASA ID:</strong> ${nasaId}</li>
+            <li class="mb-1"><strong>Date:</strong> ${date}</li>
+            ${center ? `<li class="mb-1"><strong>Center:</strong> ${center}</li>` : ''}
+            ${photographer ? `<li class="mb-1"><strong>Photographer:</strong> ${photographer}</li>` : ''}
+            ${location ? `<li class="mb-1"><strong>Location:</strong> ${location}</li>` : ''}
+        </ul>
+        
+        ${keywordsArray.length > 0 ? `
+            <h6 class="text-primary">Keywords</h6>
+            <div class="keywords mb-3">
+                ${keywordTags}
+            </div>
+        ` : ''}
+        
+        <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary btn-sm" onclick="downloadImage()">
+                <i class="fas fa-download me-1"></i>Download Image
+            </button>
+            <button class="btn btn-outline-info btn-sm" onclick="shareImage()">
+                <i class="fas fa-share me-1"></i>Share Image
+            </button>
+        </div>
+    `;
+    
+    $('#imageModal').modal('show');
+}
+
+// Zoom functionality with jQuery - Enhanced
+function toggleZoom() {
+    console.log('toggleZoom called, current state:', isZoomed);
+    
+    const img = $('#modalImage');
+    const container = $('#imageZoomContainer');
+    const zoomBtn = $('#zoomBtn');
+    
+    if (!img.length) {
+        console.error('Modal image not found');
+        return;
+    }
+    
+    if (!isZoomed) {
+        console.log('Enabling zoom...');
+        // Enable zoom
+        img.css({
+            'transform': 'scale(2)',
+            'cursor': 'zoom-out',
+            'transition': 'transform 0.3s ease'
+        });
+        container.addClass('zoomed');
+        zoomBtn.html('<i class="fas fa-search-minus me-1"></i>Zoom Out');
+        isZoomed = true;
+        panX = 0;
+        panY = 0;
+        
+        showToast('Image zoomed in. Drag to pan around.', 'info');
+        
+        // Add pan functionality
+        let isDragging = false;
+        let startX, startY;
+        
+        // Remove any existing event handlers
+        img.off('mousedown.zoom mousemove.zoom mouseup.zoom mouseleave.zoom');
+        $(document).off('mousemove.zoom mouseup.zoom');
+        
+        img.on('mousedown.zoom', function(e) {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+            img.css('cursor', 'grabbing');
+            console.log('Starting drag');
+        });
+        
+        $(document).on('mousemove.zoom', function(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            
+            // Limit panning bounds
+            const maxOffset = 150;
+            panX = Math.max(-maxOffset, Math.min(maxOffset, panX));
+            panY = Math.max(-maxOffset, Math.min(maxOffset, panY));
+            
+            img.css('transform', `scale(2) translate(${panX}px, ${panY}px)`);
+        });
+        
+        $(document).on('mouseup.zoom', function() {
+            isDragging = false;
+            img.css('cursor', 'zoom-out');
+        });
+        
+        img.on('mouseleave.zoom', function() {
+            isDragging = false;
+            img.css('cursor', 'zoom-out');
+        });
+        
+    } else {
+        console.log('Disabling zoom...');
+        // Disable zoom
+        img.css({
+            'transform': 'scale(1)',
+            'cursor': 'zoom-in',
+            'transition': 'transform 0.3s ease'
+        });
+        container.removeClass('zoomed');
+        zoomBtn.html('<i class="fas fa-search-plus me-1"></i>Zoom In');
+        isZoomed = false;
+        panX = 0;
+        panY = 0;
+        
+        showToast('Image zoom disabled', 'info');
+        
+        // Remove event handlers
+        img.off('mousedown.zoom mousemove.zoom mouseup.zoom mouseleave.zoom');
+        $(document).off('mousemove.zoom mouseup.zoom');
+    }
+    
+    console.log('toggleZoom completed, new state:', isZoomed);
+}
+
+// Maximize functionality
+function toggleMaximize() {
+    console.log('toggleMaximize called, current state:', isMaximized);
+    
+    const modal = $('#imageModal');
+    const modalDialog = modal.find('.modal-dialog');
+    const maximizeBtn = $('#maximizeBtn');
+    
+    if (!modal.length) {
+        console.error('Modal not found');
+        return;
+    }
+    
+    if (!isMaximized) {
+        console.log('Maximizing modal...');
+        // Maximize the modal
+        modal.addClass('maximized');
+        modalDialog.css({
+            'max-width': '100vw',
+            'height': '100vh',
+            'margin': '0'
+        });
+        maximizeBtn.html('<i class="fas fa-compress me-1"></i>Minimize');
+        isMaximized = true;
+        
+        // If zoomed, reset zoom for better viewing in maximized mode
+        if (isZoomed) {
+            toggleZoom();
+        }
+        
+        showToast('Modal maximized', 'success');
+    } else {
+        console.log('Restoring modal...');
+        // Restore normal size
+        modal.removeClass('maximized');
+        modalDialog.css({
+            'max-width': '',
+            'height': '',
+            'margin': ''
+        });
+        maximizeBtn.html('<i class="fas fa-expand me-1"></i>Maximize');
+        isMaximized = false;
+        
+        showToast('Modal restored', 'success');
+    }
+    
+    console.log('toggleMaximize completed, new state:', isMaximized);
+}
+
+// Enhanced download functionality
+function downloadImage() {
+    console.log('downloadImage called, currentImageUrl:', currentImageUrl);
+    
+    if (!currentImageUrl) {
+        console.error('No image URL available');
+        showToast('No image available for download', 'error');
+        return;
+    }
+    
+    try {
+        showToast('Preparing download...', 'info');
+        
+        // Get the image title for filename
+        const title = document.getElementById('imageModalTitle').textContent || 'space_image';
+        const sanitizedTitle = title.replace(/[^a-z0-9\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+        
+        console.log('Original title:', title);
+        console.log('Sanitized title:', sanitizedTitle);
+        
+        // Use the current image URL (thumbnail for now)
+        let downloadUrl = currentImageUrl;
+        
+        // For NASA images, try to get a higher resolution version
+        if (downloadUrl.includes('nasa.gov')) {
+            // Try to replace thumbnail indicators with higher resolution ones
+            downloadUrl = downloadUrl.replace(/~thumb/g, '~medium').replace(/~small/g, '~medium');
+            console.log('Modified NASA URL:', downloadUrl);
+        }
+        
+        console.log('Download URL:', downloadUrl);
+        
+        // Create a temporary link and trigger download
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = downloadUrl;
+        link.download = `${sanitizedTitle}_${Date.now()}.jpg`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        
+        console.log('Download filename:', link.download);
+        
+        // Add to DOM, click, and remove
+        document.body.appendChild(link);
+        console.log('Link added to DOM, triggering click...');
+        link.click();
+        document.body.removeChild(link);
+        console.log('Link clicked and removed from DOM');
+        
+        // Show success message
+        setTimeout(() => {
+            showToast('Download started! Check your downloads folder.', 'success');
+        }, 500);
+        
+    } catch (error) {
+        console.error('Download error:', error);
+        showToast('Download failed. Please try again.', 'error');
+    }
+}
+
+// Direct download functionality for image cards
+function downloadImageDirect(imageUrl, imageTitle) {
+    console.log('downloadImageDirect called:', imageUrl, imageTitle);
+    
+    if (!imageUrl) {
+        console.error('No image URL provided');
+        showToast('No image available for download', 'error');
+        return;
+    }
+    
+    try {
+        showToast('Preparing download...', 'info');
+        
+        // Sanitize the title for filename
+        const sanitizedTitle = imageTitle.replace(/[^a-z0-9\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+        
+        // Use the provided image URL
+        let downloadUrl = imageUrl;
+        
+        // For NASA images, try to get a higher resolution version
+        if (downloadUrl.includes('nasa.gov')) {
+            downloadUrl = downloadUrl.replace(/~thumb/g, '~medium').replace(/~small/g, '~medium');
+        }
+        
+        // Create a temporary link and trigger download
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = downloadUrl;
+        link.download = `${sanitizedTitle}_${Date.now()}.jpg`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        
+        // Add to DOM, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show success message
+        setTimeout(() => {
+            showToast('Download started! Check your downloads folder.', 'success');
+        }, 500);
+        
+    } catch (error) {
+        console.error('Download error:', error);
+        showToast('Download failed. Please try again.', 'error');
+    }
+}
+
+// Share functionality
+function shareImage() {
+    const title = document.getElementById('imageModalTitle').textContent;
+    const url = window.location.href;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: `Check out this amazing space image: ${title}`,
+            url: url
+        }).catch(console.error);
+    } else {
+        navigator.clipboard.writeText(`${title} - ${url}`).then(() => {
+            showToast('Link copied to clipboard!', 'success');
+        }).catch(() => {
+            showToast('Unable to copy link', 'error');
+        });
+    }
+}
+
+// Toast notification function
+function showToast(message, type) {
+    let alertType, iconClass;
+    
+    switch(type) {
+        case 'success':
+            alertType = 'alert-success';
+            iconClass = 'fas fa-check-circle';
+            break;
+        case 'error':
+            alertType = 'alert-danger';
+            iconClass = 'fas fa-exclamation-circle';
+            break;
+        case 'info':
+            alertType = 'alert-info';
+            iconClass = 'fas fa-info-circle';
+            break;
+        default:
+            alertType = 'alert-primary';
+            iconClass = 'fas fa-info-circle';
+    }
+    
+    const toast = $(`
+        <div class="alert ${alertType} position-fixed" 
+             style="top: 20px; right: 20px; z-index: 9999; min-width: 250px; border-radius: 10px;">
+            <i class="${iconClass} me-2"></i>
+            ${message}
+        </div>
+    `);
+    
+    $('body').append(toast);
+    
+    setTimeout(() => {
+        toast.fadeOut(300, function() {
+            $(this).remove();
+        });
+    }, 4000);
+}
+
+// Update results count
+function updateResultsCount(total) {
+    const resultsCount = document.getElementById('resultsCount');
+    const sourceText = currentSource ? ` ${currentSource}` : '';
+    resultsCount.textContent = `Showing ${total}${sourceText} images`;
+}
+
+// Update pagination
+function updatePagination(total) {
+    const itemsPerPage = 20;
+    totalPages = Math.ceil(total / itemsPerPage);
+    
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    
+    if (totalPages <= 1) {
+        document.getElementById('paginationWrapper').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('paginationWrapper').style.display = 'flex';
+    
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>`;
+    pagination.appendChild(prevLi);
+    
+    // Page numbers
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+        pagination.appendChild(li);
+    }
+    
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>`;
+    pagination.appendChild(nextLi);
+}
+
+// Change page
+function changePage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    loadImages();
+}
+
+// Utility functions
+function showLoading() {
+    document.getElementById('loadingSpinner').style.display = 'block';
+    document.getElementById('imagesGrid').style.display = 'none';
+    document.getElementById('noResults').style.display = 'none';
+}
+
+function hideLoading() {
+    document.getElementById('loadingSpinner').style.display = 'none';
+}
+
+function showNoResults() {
+    document.getElementById('noResults').style.display = 'block';
+    document.getElementById('paginationWrapper').style.display = 'none';
+}
+
+function hideNoResults() {
+    document.getElementById('noResults').style.display = 'none';
+}
+
+function hideImagesGrid() {
+    document.getElementById('imagesGrid').style.display = 'none';
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// Event listeners
+$(document).ready(function() {
+    // Enter key search
+    $('#searchInput').on('keypress', function(e) {
+        if (e.which === 13) {
+            searchImages();
+        }
+    });
+    
+    // Debounced search
+    let searchTimeout;
+    $('#searchInput').on('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(searchImages, 500);
+    });
+    
+    // Filter changes
+    $('#yearFilter, #sourceFilter').on('change', searchImages);
+    
+    // Keyboard shortcuts for modal
+    $(document).on('keydown', function(e) {
+        if ($('#imageModal').hasClass('show')) {
+            console.log('Keyboard shortcut pressed:', e.key);
+            switch(e.key.toLowerCase()) {
+                case 'z':
+                    e.preventDefault();
+                    console.log('Triggering zoom toggle');
+                    toggleZoom();
+                    break;
+                case 'm':
+                    e.preventDefault();
+                    console.log('Triggering maximize toggle');
+                    toggleMaximize();
+                    break;
+                case 'd':
+                    e.preventDefault();
+                    console.log('Triggering download');
+                    downloadImage();
+                    break;
+                case 's':
+                    e.preventDefault();
+                    console.log('Triggering share');
+                    shareImage();
+                    break;
+                case 'escape':
+                    if (isMaximized) {
+                        toggleMaximize();
+                    }
+                    break;
+            }
+        }
+    });
+    
+    // Initialize image previewer plugin
+    initializeImagePreviewer();
+});
+
+// jQuery Image Previewer Plugin
+function initializeImagePreviewer() {
+    $.fn.imagePreviewer = function(options) {
+        var defaults = {
+            scroll: true,
+        };
+
+        var options = $.extend(defaults, options);
+
+        this.each(function() {
+            var _this = $(this);
+
+            $("img", _this).css('cursor', 'zoom-in').on("click", function(e) {
+                e.stopPropagation(); // Prevent card modal from opening
+
+                if ($("#image_preview_popup").length == 0) {
+                    $("body").append('\
+                        <div class="layer image-preview-layer flex" id="image_preview_popup">\
+                            <div class="layer-wrap">\
+                                <img src="' + $(this).attr("src") + '" alt="' + ($(this).attr("alt") || "") + '" class="hide">\
+                            </div>\
+                        </div>\
+                    ');
+                    setTimeout(function() {
+                        $("#image_preview_popup img").removeClass("hide");
+                    }, 100);
+                } else {
+                    $("#image_preview_popup").show();
+                    $("#image_preview_popup img").attr("src", $(this).attr("src"))
+                        .attr("alt", $(this).attr("alt"))
+                        .removeClass("hide");
+                }
+
+                var hideImagePop = function() {
+                    if ($("#image_preview_popup").length) {
+                        $("#image_preview_popup img").addClass("hide");
+                        setTimeout(function() {
+                            $("#image_preview_popup").hide();
+                        }, 200);
+                    }
+                    $("#image_preview_popup").off("click.image_preview_popup");
+                    options.scroll && $(window).off("scroll.image_preview_popup");
+                };
+
+                $("#image_preview_popup").on("click.image_preview_popup", hideImagePop);
+                options.scroll && $(window).on("scroll.image_preview_popup", hideImagePop);
+            });
+        });
+
+        return $(this);
+    };
+    
+    // Add CSS for image previewer
+    if (!$('#image-previewer-styles').length) {
+        $(document.head).append('<style id="image-previewer-styles">.layer {position: fixed;z-index: 100000;top: 0;right: 0;bottom: 0;left: 0;overflow: auto;background-color: rgba(43,51,59,0.80);}\
+                                    .flex {display:flex;display:-webkit-flex;align-items: center;justify-content: center;}\
+                                    #image_preview_popup img.hide {opacity:0;transform:scale(0);transition:all 0.2s;cursor:zoom-out;}\
+                                    #image_preview_popup img {width:auto;max-width:90%;height:auto;max-height:90%;opacity:1;transform:scale(1);transition:all 0.2s;cursor:zoom-out;}\
+                                </style>');
+    }
+    
+    // Initialize the plugin on images grid
+    $('#imagesGrid').imagePreviewer();
+}
+
+// Function to reinitialize image previewer when new images are loaded
+function reinitializeImagePreviewer() {
+    $('#imagesGrid').imagePreviewer();
+}
+</script>
+{% endblock %}

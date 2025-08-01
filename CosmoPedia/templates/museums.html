@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Space Museums - Cosmopedia{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding-top: 100px; max-width: 1400px;">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="text-gradient mb-3">
+                    <i class="fas fa-university me-3"></i>Space Museums of the World
+                </h1>
+                <p class="lead text-light">Explore the most fascinating space museums and planetariums across the globe</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-10">
+            <div class="card bg-glass border-0 p-4">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-0 text-primary">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="museumSearch" class="form-control bg-dark border-0 text-light" 
+                                   placeholder="Search museums..." style="box-shadow: none;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="countryFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Countries</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button id="clearFilters" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-times me-1"></i>Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading museums...</p>
+    </div>
+
+    <!-- Results Count -->
+    <div id="resultsCount" class="text-center mb-4" style="display: none;">
+        <p class="text-muted" id="museumCount">Found 0 museum(s)</p>
+    </div>
+
+    <!-- Museums Grid -->
+    <div id="museumsGrid" class="row g-4" style="display: none;">
+        <!-- Museums will be loaded here -->
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="d-flex justify-content-center mt-5" style="display: none;">
+        <nav aria-label="Museums pagination">
+            <ul class="pagination pagination-lg" id="paginationList">
+                <!-- Pagination will be generated here -->
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <div class="empty-state">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No Museums Found</h4>
+            <p>Try adjusting your search criteria or filters.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Museum Detail Modal -->
+<div class="modal fade" id="museumModal" tabindex="-1" aria-labelledby="museumModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="background: rgba(20, 25, 40, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light" id="museumModalLabel">Museum Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-light">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 id="modalMuseumName" class="text-primary mb-3"></h4>
+                        <p id="modalMuseumFamousFor" class="mb-3"></p>
+                        <div class="mb-3">
+                            <strong class="text-warning">Country:</strong>
+                            <span id="modalMuseumCountry"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-warning">City/Region:</strong>
+                            <span id="modalMuseumCity"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-warning">Established:</strong>
+                            <span id="modalMuseumYear"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-warning">Annual Visitors:</strong>
+                            <span id="modalMuseumVisitors"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-warning">More Info:</strong>
+                            <span id="modalMuseumInfo"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allMuseums = [];
+let filteredMuseums = [];
+let currentPage = 1;
+let pageSize = 20;
+let totalMuseums = 0;
+
+// Load museums data
+async function loadMuseums(page = 1) {
+    try {
+        const search = document.getElementById('museumSearch').value.trim();
+        const country = document.getElementById('countryFilter').value;
+        const response = await fetch(`/api/museums?search=${encodeURIComponent(search)}&country=${encodeURIComponent(country)}&page=${page}&page_size=${pageSize}`);
+        const data = await response.json();
+        filteredMuseums = data.items;
+        totalMuseums = data.total;
+        currentPage = data.page;
+
+        // Hide loading, show content
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('museumsGrid').style.display = filteredMuseums.length ? 'flex' : 'none';
+        document.getElementById('museumsGrid').style.flexWrap = 'wrap';
+        document.getElementById('resultsCount').style.display = 'block';
+        document.getElementById('museumCount').textContent = `Found ${totalMuseums} museum(s)`;
+        document.getElementById('emptyState').style.display = filteredMuseums.length ? 'none' : 'block';
+        document.getElementById('pagination').style.display = totalMuseums > pageSize ? 'flex' : 'none';
+
+        renderMuseums();
+        renderPagination();
+    } catch (error) {
+        console.error('Error loading museums:', error);
+        document.getElementById('loadingState').innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h4>Error Loading Museums</h4>
+                <p>Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+// Render museums grid
+function renderMuseums() {
+    const grid = document.getElementById('museumsGrid');
+    grid.innerHTML = '';
+    filteredMuseums.forEach((museum, idx) => {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 col-xl-3 d-flex';
+        col.innerHTML = `
+            <div class="card interactive-card museum-card flex-fill mb-4" data-idx="${idx}" style="cursor:pointer; min-height: 320px;">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title text-gradient mb-2">${museum.name}</h5>
+                        <p class="card-text mb-2"><i class="fas fa-map-marker-alt me-1"></i> ${museum.city_or_region}, ${museum.country}</p>
+                        <p class="card-text mb-2"><i class="fas fa-star me-1"></i> ${museum.famous_for}</p>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-primary me-2">Established: ${museum.established_year || 'N/A'}</span>
+                        <span class="badge bg-info">Visitors: ${museum.annual_visitors ? museum.annual_visitors.toLocaleString() : 'N/A'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        grid.appendChild(col);
+    });
+    // Add click event for modal
+    document.querySelectorAll('.museum-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const idx = this.getAttribute('data-idx');
+            showMuseumModal(filteredMuseums[idx]);
+        });
+    });
+}
+
+// Render pagination
+function renderPagination() {
+    const paginationList = document.getElementById('paginationList');
+    paginationList.innerHTML = '';
+    const totalPages = Math.ceil(totalMuseums / pageSize);
+    for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item${i === currentPage ? ' active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (i !== currentPage) loadMuseums(i);
+        });
+        paginationList.appendChild(li);
+    }
+}
+
+// Show museum modal
+function showMuseumModal(museum) {
+    document.getElementById('modalMuseumName').textContent = museum.name;
+    document.getElementById('modalMuseumFamousFor').textContent = museum.famous_for;
+    document.getElementById('modalMuseumCountry').textContent = museum.country;
+    document.getElementById('modalMuseumCity').textContent = museum.city_or_region;
+    document.getElementById('modalMuseumYear').textContent = museum.established_year || 'N/A';
+    document.getElementById('modalMuseumVisitors').textContent = museum.annual_visitors ? museum.annual_visitors.toLocaleString() : 'N/A';
+    document.getElementById('modalMuseumInfo').textContent = museum.additional_info || '';
+    const modal = new bootstrap.Modal(document.getElementById('museumModal'));
+    modal.show();
+}
+
+// Populate country filter
+async function populateCountryFilter() {
+    try {
+        const response = await fetch('/api/museums');
+        const data = await response.json();
+        const countries = Array.from(new Set(data.items.map(m => m.country))).sort();
+        const select = document.getElementById('countryFilter');
+        select.innerHTML = '<option value="">All Countries</option>';
+        countries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error populating country filter:', error);
+    }
+}
+
+// Event listeners
+window.addEventListener('DOMContentLoaded', () => {
+    populateCountryFilter().then(() => loadMuseums());
+    document.getElementById('museumSearch').addEventListener('input', () => loadMuseums(1));
+    document.getElementById('countryFilter').addEventListener('change', () => loadMuseums(1));
+    document.getElementById('clearFilters').addEventListener('click', () => {
+        document.getElementById('museumSearch').value = '';
+        document.getElementById('countryFilter').value = '';
+        loadMuseums(1);
+    });
+});
+</script>
+
+<style>
+.card.museum-card {
+    background: linear-gradient(135deg, rgba(8, 12, 20, 0.92) 0%, rgba(12, 16, 28, 0.88) 30%, rgba(16, 20, 32, 0.85) 70%, rgba(10, 14, 24, 0.90) 100%);
+    border-radius: 18px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-light) !important;
+    transition: var(--transition-smooth);
+    overflow: hidden;
+}
+.card.museum-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    border-color: rgba(0, 180, 255, 0.2);
+}
+.card-title.text-gradient {
+    background: linear-gradient(135deg, #ffd700, #00b4ff, #1e88e5);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: textGradient 3s ease-in-out infinite;
+}
+</style>
+{% endblock %} 

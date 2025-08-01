@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}NASA Missions - Cosmopedia{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding-top: 100px;">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="text-gradient mb-3">
+                    <i class="fas fa-rocket me-3"></i>NASA Missions
+                </h1>
+                <p class="lead">Explore the incredible journey of human space exploration</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="filter-section">
+                <h5><i class="fas fa-filter me-2"></i>Search & Filter</h5>
+                <div class="row g-3">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Search Missions</label>
+                        <div class="position-relative">
+                            <input type="text" class="form-control search-input" id="searchInput" 
+                                   placeholder="Search by name, description, or destination...">
+                            <i class="fas fa-search position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5);"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Mission Type</label>
+                        <select class="form-select search-input" id="typeFilter">
+                            <option value="">All Types</option>
+                            <option value="Crewed">Crewed</option>
+                            <option value="Robotic">Robotic</option>
+                            <option value="Orbital">Orbital</option>
+                            <option value="Landing">Landing</option>
+                            <option value="Flyby">Flyby</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select search-input" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Planned">Planned</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Year Range</label>
+                        <select class="form-select search-input" id="yearFilter">
+                            <option value="">All Years</option>
+                            <option value="1960s">1960s</option>
+                            <option value="1970s">1970s</option>
+                            <option value="1980s">1980s</option>
+                            <option value="1990s">1990s</option>
+                            <option value="2000s">2000s</option>
+                            <option value="2010s">2010s</option>
+                            <option value="2020s">2020s</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Sort By</label>
+                        <select class="form-select search-input" id="sortFilter">
+                            <option value="date">Launch Date</option>
+                            <option value="alphabetical">Alphabetical</option>
+                            <option value="year">Year</option>
+                            <option value="status">Status</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission Count and View Toggle -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-white">
+                    <span id="missionCount">{{ missions|length if missions else 0 }}</span> Missions Found
+                </h5>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-light active" onclick="setView('grid')">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-light" onclick="setView('list')">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Missions Grid -->
+    <div class="row g-4" id="missionsGrid">
+        {% if missions %}
+            {% for mission in missions %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mission-item" 
+                 data-name="{{ mission.name|lower }}"
+                 data-type="{{ mission.mission_type|lower }}"
+                 data-status="{{ mission.status|lower }}"
+                 data-year="{{ mission.launch_date[:4] if mission.launch_date and mission.launch_date != 'Unknown' else '' }}">
+                
+                <div class="card mission-card-compact glow-on-hover h-100">
+                    <!-- Mission Image -->
+                    {% if mission.image_url %}
+                    <img src="{{ mission.image_url }}" 
+                         alt="{{ mission.image_alt or mission.name }}" 
+                         class="mission-image"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    {% endif %}
+                    
+                    <!-- Placeholder if no image -->
+                    <div class="d-flex align-items-center justify-content-center bg-glass" 
+                         style="height: 120px; {% if mission.image_url %}display: none;{% endif %} border-radius: 16px 16px 0 0;">
+                        <i class="fas fa-rocket fa-2x text-muted"></i>
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <!-- Mission Title -->
+                        <h6 class="card-title mb-2">{{ mission.name }}</h6>
+                        
+                        <!-- Mission Type Badge -->
+                        <div class="mb-2">
+                            <span class="badge bg-secondary rounded-pill">
+                                <i class="fas fa-tag me-1"></i>{{ mission.mission_type or mission.type or 'Space Mission' }}
+                            </span>
+                        </div>
+                        
+                        <!-- Mission Description -->
+                        <p class="card-text flex-grow-1">
+                            {{ mission.description[:120] + '...' if mission.description and mission.description|length > 120 else mission.description or 'Explore the mysteries of space with this fascinating NASA mission.' }}
+                        </p>
+                        
+                        <!-- Mission Details -->
+                        <div class="mission-details-compact mt-auto">
+                            <!-- Status -->
+                            <div class="mb-2">
+                                <span class="mission-status status-{{ mission.status|lower if mission.status else 'unknown' }}">
+                                    {{ mission.status or 'Unknown' }}
+                                </span>
+                            </div>
+                            
+                            <!-- Launch Date -->
+                            {% if mission.launch_date and mission.launch_date != 'Unknown' %}
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ mission.launch_date }}
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Destination -->
+                            {% if mission.destination %}
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    {{ mission.destination }}
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Duration -->
+                            {% if mission.duration %}
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ mission.duration }}
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-primary btn-sm flex-grow-1" 
+                                        onclick="showMissionDetails('{{ mission.name }}')">
+                                    <i class="fas fa-info-circle me-1"></i>Details
+                                </button>
+                                <button class="btn btn-outline-light btn-sm" 
+                                        onclick="askAI('{{ mission.name }}')">
+                                    <img src="https://img.icons8.com/stickers/100/bard.png" alt="AI" style="width: 16px; height: 16px; filter: brightness(0) invert(1); margin-right: 0.25rem;">AI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- No Missions Found -->
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-rocket"></i>
+                    <h4>No Missions Found</h4>
+                    <p>Try adjusting your search criteria or filters to find missions.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination and pagination.total_pages > 1 %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav aria-label="Mission pagination">
+                <ul class="pagination justify-content-center">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('missions', page=pagination.prev_num) if url_for else '#' }}">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in range(1, pagination.total_pages + 1) %}
+                        {% if page_num == pagination.page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% elif page_num <= 3 or page_num > pagination.total_pages - 3 or (page_num >= pagination.page - 1 and page_num <= pagination.page + 1) %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('missions', page=page_num) if url_for else '#' }}">{{ page_num }}</a>
+                        </li>
+                        {% elif page_num == 4 or page_num == pagination.total_pages - 3 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('missions', page=pagination.next_num) if url_for else '#' }}">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Mission Details Modal -->
+<div class="modal fade" id="missionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-glass border-glow">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-gradient" id="missionModalTitle">Mission Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="missionModalBody">
+                <!-- Mission details will be loaded here -->
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Search and filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const yearFilter = document.getElementById('yearFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const missionCount = document.getElementById('missionCount');
+    
+    function filterMissions() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const typeFilter_val = typeFilter.value.toLowerCase();
+        const statusFilter_val = statusFilter.value.toLowerCase();
+        const yearFilter_val = yearFilter.value;
+        
+        const missions = document.querySelectorAll('.mission-item');
+        let visibleCount = 0;
+        
+        missions.forEach(mission => {
+            const name = mission.dataset.name;
+            const type = mission.dataset.type;
+            const status = mission.dataset.status;
+            const year = mission.dataset.year;
+            const description = mission.querySelector('.card-text').textContent.toLowerCase();
+            
+            let show = true;
+            
+            // Search filter
+            if (searchTerm && !name.includes(searchTerm) && !description.includes(searchTerm)) {
+                show = false;
+            }
+            
+            // Type filter
+            if (typeFilter_val && !type.includes(typeFilter_val)) {
+                show = false;
+            }
+            
+            // Status filter
+            if (statusFilter_val && status !== statusFilter_val) {
+                show = false;
+            }
+            
+            // Year filter
+            if (yearFilter_val && year) {
+                const decade = Math.floor(parseInt(year) / 10) * 10;
+                if (yearFilter_val !== `${decade}s`) {
+                    show = false;
+                }
+            }
+            
+            mission.style.display = show ? 'block' : 'none';
+            if (show) visibleCount++;
+        });
+        
+        missionCount.textContent = visibleCount;
+    }
+    
+    // Add event listeners
+    searchInput.addEventListener('input', filterMissions);
+    typeFilter.addEventListener('change', filterMissions);
+    statusFilter.addEventListener('change', filterMissions);
+    yearFilter.addEventListener('change', filterMissions);
+    
+    // Sort functionality
+    sortFilter.addEventListener('change', function() {
+        const container = document.getElementById('missionsGrid');
+        const missions = Array.from(container.children);
+        
+        missions.sort((a, b) => {
+            switch(this.value) {
+                case 'alphabetical':
+                    return a.dataset.name.localeCompare(b.dataset.name);
+                case 'year':
+                    return (b.dataset.year || '0').localeCompare(a.dataset.year || '0');
+                case 'status':
+                    return a.dataset.status.localeCompare(b.dataset.status);
+                default: // date
+                    return (b.dataset.year || '0').localeCompare(a.dataset.year || '0');
+            }
+        });
+        
+        missions.forEach(mission => container.appendChild(mission));
+    });
+});
+
+// View toggle functionality
+function setView(viewType) {
+    const buttons = document.querySelectorAll('.btn-group button');
+    const grid = document.getElementById('missionsGrid');
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    if (viewType === 'list') {
+        grid.classList.add('row-cols-1');
+        grid.classList.remove('g-4');
+    } else {
+        grid.classList.remove('row-cols-1');
+        grid.classList.add('g-4');
+    }
+}
+
+// Mission details modal
+function showMissionDetails(missionName) {
+    // This would typically fetch detailed data from the server
+    const modal = new bootstrap.Modal(document.getElementById('missionModal'));
+    document.getElementById('missionModalTitle').textContent = missionName;
+    document.getElementById('missionModalBody').innerHTML = `
+        <p>Loading detailed information for ${missionName}...</p>
+        <div class="text-center">
+            <div class="loading-spinner"></div>
+        </div>
+    `;
+    modal.show();
+    
+    // Simulate loading delay
+    setTimeout(() => {
+        document.getElementById('missionModalBody').innerHTML = `
+            <h6>Mission Overview</h6>
+            <p>Detailed information about ${missionName} would be displayed here.</p>
+            <h6>Technical Specifications</h6>
+            <ul>
+                <li>Launch vehicle and specifications</li>
+                <li>Mission duration and objectives</li>
+                <li>Scientific instruments and capabilities</li>
+                <li>Key achievements and discoveries</li>
+            </ul>
+        `;
+    }, 1000);
+}
+
+// AI Assistant functionality
+function askAI(missionName) {
+    alert(`AI Assistant feature would provide detailed information about ${missionName}. This is a placeholder for the AI integration.`);
+}
+</script>
+{% endblock %}

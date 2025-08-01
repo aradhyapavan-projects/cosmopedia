@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmopedia - Discover the Universe</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Space Theme CSS -->
+    <link rel="stylesheet" href="static/css/space-theme.css">
+    
+    <style>
+        /* Custom animations for cards */
+        .feature-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #0066cc;
+            box-shadow: 0 15px 40px rgba(0, 102, 204, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ffd23f;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+            color: #ff6b35;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="200" cy="300" r="2" fill="white" opacity="0.3"/><circle cx="800" cy="200" r="1" fill="white" opacity="0.5"/><circle cx="500" cy="100" r="1.5" fill="white" opacity="0.4"/><circle cx="300" cy="600" r="1" fill="white" opacity="0.3"/><circle cx="700" cy="700" r="2" fill="white" opacity="0.4"/></svg>');
+            animation: twinkle 4s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0066cc, #ffd23f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #e8e8e8;
+            margin-bottom: 2rem;
+        }
+        
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .stats-section {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 3rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0066cc;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #0066cc, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-title p {
+            color: #999;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-rocket me-2"></i>
+                Cosmopedia
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/terminologies">
+                            <i class="fas fa-book me-1"></i>Terminologies
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#missions">
+                            <i class="fas fa-rocket me-1"></i>Missions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#planets">
+                            <i class="fas fa-globe me-1"></i>Planets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#rockets">
+                            <i class="fas fa-space-shuttle me-1"></i>Rockets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#astronauts">
+                            <i class="fas fa-user-astronaut me-1"></i>Astronauts
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h1 class="hero-title">Explore the Universe</h1>
+                    <p class="hero-subtitle">
+                        Discover space terminologies, NASA missions, planets, rockets, and the brave explorers who venture beyond our world
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/terminologies" class="btn btn-primary btn-lg me-3 pulse-btn">
+                            <i class="fas fa-book me-2"></i>Space Terminologies
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-rocket me-2"></i>Explore Features
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="section-title">
+                <h2><i class="fas fa-star me-3"></i>Discover Space</h2>
+                <p>Explore different aspects of space exploration and astronomy</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-book feature-icon"></i>
+                            <h5 class="card-title">Space Terminologies</h5>
+                            <p class="card-text">Learn space-related terms, definitions, and concepts from astronomy and space technology.</p>
+                            <a href="/terminologies" class="btn btn-primary btn-sm">
+                                <i class="fas fa-search me-1"></i>Explore
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-rocket feature-icon"></i>
+                            <h5 class="card-title">NASA Missions</h5>
+                            <p class="card-text">Explore historic and current NASA space missions with detailed information and images.</p>
+                            <a href="#missions" class="btn btn-primary btn-sm">
+                                <i class="fas fa-rocket me-1"></i>Explore
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-globe feature-icon"></i>
+                            <h5 class="card-title">Planets</h5>
+                            <p class="card-text">Discover planets in our solar system and beyond with scientific data and stunning visuals.</p>
+                            <a href="#planets" class="btn btn-primary btn-sm">
+                                <i class="fas fa-globe me-1"></i>Discover
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-space-shuttle feature-icon"></i>
+                            <h5 class="card-title">Rockets</h5>
+                            <p class="card-text">Learn about the powerful rockets that carry us to space, from Saturn V to Falcon Heavy.</p>
+                            <a href="#rockets" class="btn btn-primary btn-sm">
+                                <i class="fas fa-space-shuttle me-1"></i>Learn
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-user-astronaut feature-icon"></i>
+                            <h5 class="card-title">Astronauts</h5>
+                            <p class="card-text">Meet the brave explorers who venture into space to expand human knowledge.</p>
+                            <a href="#astronauts" class="btn btn-primary btn-sm">
+                                <i class="fas fa-user-astronaut me-1"></i>Meet
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-satellite feature-icon"></i>
+                            <h5 class="card-title">Space Technology</h5>
+                            <p class="card-text">Explore cutting-edge technology used in space exploration and satellite communications.</p>
+                            <a href="#technology" class="btn btn-primary btn-sm">
+                                <i class="fas fa-satellite me-1"></i>Explore
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-meteor feature-icon"></i>
+                            <h5 class="card-title">Astronomy</h5>
+                            <p class="card-text">Study stars, galaxies, and cosmic phenomena that make up our vast universe.</p>
+                            <a href="#astronomy" class="btn btn-primary btn-sm">
+                                <i class="fas fa-meteor me-1"></i>Study
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-search feature-icon"></i>
+                            <h5 class="card-title">Space Search</h5>
+                            <p class="card-text">Search through comprehensive space databases and find specific information quickly.</p>
+                            <a href="#search" class="btn btn-primary btn-sm">
+                                <i class="fas fa-search me-1"></i>Search
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section" id="stats">
+        <div class="container">
+            <div class="section-title">
+                <h2><i class="fas fa-chart-line me-3"></i>Space by Numbers</h2>
+                <p>Fascinating statistics about space exploration and our universe</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number" id="terminologyCount">500+</span>
+                        <span class="stat-label">Space Terms</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label">Astronauts on Moon</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number">400+</span>
+                        <span class="stat-label">ISS Missions</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number">5000+</span>
+                        <span class="stat-label">Exoplanets</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5" style="background: rgba(0, 102, 204, 0.1);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2 class="mb-4">Ready to Explore Space?</h2>
+                    <p class="lead mb-4">Start your journey into the cosmos with our comprehensive space terminology database.</p>
+                    <a href="/terminologies" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket me-2"></i>Start Exploring
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4" style="background: rgba(0, 0, 0, 0.5); border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-rocket me-2"></i>Cosmopedia</h5>
+                    <p class="text-muted">Exploring the universe through technology and knowledge.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted">&copy; 2024 Cosmopedia. Built with passion for space exploration.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Space Theme JS -->
+    <script src="static/js/space-theme.js"></script>
+    
+    <script>
+        // Load terminology count dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTerminologyCount();
+        });
+
+        async function loadTerminologyCount() {
+            try {
+                const response = await fetch('/api/terms');
+                const terms = await response.json();
+                const count = terms.length;
+                document.getElementById('terminologyCount').textContent = count;
+            } catch (error) {
+                console.error('Error loading terminology count:', error);
+            }
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cosmopedia{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Material Design Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Space Theme CSS -->
+    <link rel="stylesheet" href="static/css/space-theme.css">
+    
+    <!-- Quantum Preloader CSS -->
+    <link rel="stylesheet" href="static/css/quantum-preloader.css">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Futuristic Quantum Space Preloader - Only for Index Page, Once Per Session -->
+    <script>
+        // Check if current page is index and preloader hasn't been shown this session
+        const isIndexPage = window.location.pathname === '/' || window.location.pathname.includes('index');
+        const preloaderShown = sessionStorage.getItem('quantumSpacePreloaderShown');
+        
+        if (isIndexPage && !preloaderShown) {
+            document.write(`
+                <div id="quantumSpacePreloader" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: linear-gradient(45deg, #000000, #0a0a0a, #1a0033, #2a0066, #000000);
+                    background-size: 400% 400%;
+                    animation: quantumBackground 8s ease infinite;
+                    z-index: 999999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: 'Space Grotesk', 'Orbitron', monospace;
+                    overflow: hidden;
+                ">
+                    <!-- Quantum Particle Field -->
+                    <div id="quantumField" style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: 
+                            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                            radial-gradient(circle at 40% 40%, rgba(120, 255, 198, 0.2) 0%, transparent 50%);
+                        animation: quantumShift 6s ease-in-out infinite alternate;
+                    "></div>
+                    
+                    <!-- Dynamic Star Field -->
+                    <div id="hyperStars" style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: 
+                            radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.9), transparent),
+                            radial-gradient(2px 2px at 40px 70px, rgba(0,255,255,0.8), transparent),
+                            radial-gradient(1px 1px at 90px 40px, rgba(255,0,255,0.9), transparent),
+                            radial-gradient(1px 1px at 130px 80px, rgba(255,255,0,0.6), transparent),
+                            radial-gradient(2px 2px at 160px 30px, rgba(0,255,0,0.7), transparent),
+                            radial-gradient(1px 1px at 200px 100px, rgba(255,128,0,0.8), transparent);
+                        background-repeat: repeat;
+                        background-size: 250px 200px;
+                        animation: hyperSpeed 4s linear infinite, colorShift 3s ease-in-out infinite alternate;
+                    "></div>
+                    
+                    <!-- Holographic Interface -->
+                    <div class="quantum-hologram" style="
+                        position: relative;
+                        z-index: 10;
+                        text-align: center;
+                        background: rgba(0, 255, 255, 0.05);
+                        border: 1px solid rgba(0, 255, 255, 0.3);
+                        border-radius: 20px;
+                        padding: 3rem 2rem;
+                        backdrop-filter: blur(10px);
+                        box-shadow: 
+                            0 0 50px rgba(0, 255, 255, 0.3),
+                            inset 0 0 50px rgba(0, 255, 255, 0.1);
+                        animation: hologramFlicker 2s ease-in-out infinite alternate;
+                    ">
+                        <!-- Neural Network Background -->
+                        <div class="neural-network"></div>
+                        
+                        <!-- Quantum Core Animation -->
+                        <div style="
+                            width: 200px;
+                            height: 200px;
+                            margin: 0 auto 2rem auto;
+                            position: relative;
+                        ">
+                            <!-- Outer Ring -->
+                            <div style="
+                                position: absolute;
+                                width: 100%;
+                                height: 100%;
+                                border: 3px solid transparent;
+                                border-top: 3px solid #00ffff;
+                                border-right: 3px solid #ff0080;
+                                border-radius: 50%;
+                                animation: quantumSpin 3s linear infinite;
+                            "></div>
+                            
+                            <!-- Middle Ring -->
+                            <div style="
+                                position: absolute;
+                                top: 20px;
+                                left: 20px;
+                                width: calc(100% - 40px);
+                                height: calc(100% - 40px);
+                                border: 2px solid transparent;
+                                border-bottom: 2px solid #ff6b35;
+                                border-left: 2px solid #ffd23f;
+                                border-radius: 50%;
+                                animation: quantumSpin 2s linear infinite reverse;
+                            "></div>
+                            
+                            <!-- Inner Core -->
+                            <div class="quantum-core-enhanced" style="
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                width: 80px;
+                                height: 80px;
+                                background: 
+                                    radial-gradient(circle, #4a90e2 0%, #357abd 50%, #1e3a5f 100%);
+                                border-radius: 50%;
+                                transform: translate(-50%, -50%);
+                                box-shadow: 
+                                    0 0 30px rgba(74, 144, 226, 0.8),
+                                    0 0 60px rgba(74, 144, 226, 0.4),
+                                    inset 0 0 20px rgba(255, 255, 255, 0.2);
+                                animation: quantumPulse 1.5s ease-in-out infinite alternate;
+                            "></div>
+                            
+                            <!-- Quantum Particles -->
+                            <div style="
+                                position: absolute;
+                                top: 10px;
+                                left: 50%;
+                                width: 6px;
+                                height: 6px;
+                                background: #00ffff;
+                                border-radius: 50%;
+                                transform: translateX(-50%);
+                                box-shadow: 0 0 15px #00ffff;
+                                animation: quantumOrbit 4s linear infinite;
+                            "></div>
+                            <div style="
+                                position: absolute;
+                                bottom: 10px;
+                                left: 50%;
+                                width: 6px;
+                                height: 6px;
+                                background: #ff0080;
+                                border-radius: 50%;
+                                transform: translateX(-50%);
+                                box-shadow: 0 0 15px #ff0080;
+                                animation: quantumOrbit 4s linear infinite 2s;
+                            "></div>
+                            
+                            <!-- Additional Orbital Particles -->
+                            <div style="
+                                position: absolute;
+                                top: 50%;
+                                right: 10px;
+                                width: 4px;
+                                height: 4px;
+                                background: #ffd23f;
+                                border-radius: 50%;
+                                transform: translateY(-50%);
+                                box-shadow: 0 0 10px #ffd23f;
+                                animation: quantumOrbit 3s linear infinite 1s;
+                            "></div>
+                            <div style="
+                                position: absolute;
+                                top: 50%;
+                                left: 10px;
+                                width: 4px;
+                                height: 4px;
+                                background: #ff6b35;
+                                border-radius: 50%;
+                                transform: translateY(-50%);
+                                box-shadow: 0 0 10px #ff6b35;
+                                animation: quantumOrbit 3s linear infinite 3s;
+                            "></div>
+                        </div>
+                        
+                        <!-- Holographic Title -->
+                        <div style="
+                            font-size: 2.8rem;
+                            font-weight: 700;
+                            margin-bottom: 1rem;
+                            letter-spacing: 0.4rem;
+                            color: #fff;
+                            text-shadow: 
+                                0 0 10px rgba(0, 255, 255, 0.8),
+                                0 0 20px rgba(0, 255, 255, 0.6),
+                                0 0 30px rgba(0, 255, 255, 0.4);
+                            animation: holographicGlow 2s ease-in-out infinite alternate;
+                        ">COSMOPEDIA</div>
+                        
+                        <div style="
+                            font-size: 1.1rem;
+                            color: rgba(255,255,255,0.8);
+                            margin-bottom: 2rem;
+                            letter-spacing: 0.2rem;
+                            animation: typewriter 3s steps(40) 1s forwards;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            width: 0;
+                            margin-left: auto;
+                            margin-right: auto;
+                        ">QUANTUM SYSTEMS INITIALIZING...</div>
+                        
+                        <!-- Quantum Progress Matrix -->
+                        <div style="
+                            width: 400px;
+                            height: 6px;
+                            background: rgba(255,255,255,0.1);
+                            border-radius: 3px;
+                            margin: 0 auto 1rem auto;
+                            overflow: hidden;
+                            border: 1px solid rgba(0, 255, 255, 0.3);
+                        ">
+                            <div style="
+                                height: 100%;
+                                background: linear-gradient(90deg, 
+                                    #00ffff 0%, 
+                                    #ff0080 25%, 
+                                    #ffd23f 50%, 
+                                    #ff6b35 75%, 
+                                    #00ffff 100%);
+                                border-radius: 3px;
+                                width: 0%;
+                                animation: quantumLoading 4s ease-in-out forwards;
+                                box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+                            "></div>
+                        </div>
+                        
+                        <!-- System Status -->
+                        <div style="
+                            font-size: 0.9rem;
+                            color: rgba(0, 255, 255, 0.8);
+                            letter-spacing: 0.1rem;
+                            animation: statusBlink 1s ease-in-out infinite;
+                        ">◉ QUANTUM ENTANGLEMENT ESTABLISHED</div>
+                        
+                        <!-- Loading Percentage -->
+                        <div class="quantum-percentage" id="quantumPercentage">0%</div>
+                        
+                        <!-- Accessibility indicator -->
+                        <div class="quantum-focus-indicator">ESC to skip</div>
+                    </div>
+                    
+                    <!-- Audio Feedback (Optional) -->
+                    <audio id="quantumAudio" preload="auto" style="display: none;">
+                        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+LwtWEcBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFA==" type="audio/wav">
+                    </audio>
+                    
+                    <style>
+                        @keyframes quantumBackground {
+                            0% { background-position: 0% 50%; }
+                            50% { background-position: 100% 50%; }
+                            100% { background-position: 0% 50%; }
+                        }
+                        
+                        @keyframes quantumShift {
+                            0% { 
+                                transform: scale(1) rotate(0deg);
+                                filter: hue-rotate(0deg);
+                            }
+                            100% { 
+                                transform: scale(1.1) rotate(180deg);
+                                filter: hue-rotate(360deg);
+                            }
+                        }
+                        
+                        @keyframes hyperSpeed {
+                            0% { transform: translateY(0px); }
+                            100% { transform: translateY(-200px); }
+                        }
+                        
+                        @keyframes colorShift {
+                            0% { filter: hue-rotate(0deg) saturate(1); }
+                            100% { filter: hue-rotate(60deg) saturate(1.5); }
+                        }
+                        
+                        @keyframes hologramFlicker {
+                            0% { 
+                                box-shadow: 
+                                    0 0 50px rgba(0, 255, 255, 0.3),
+                                    inset 0 0 50px rgba(0, 255, 255, 0.1);
+                            }
+                            100% { 
+                                box-shadow: 
+                                    0 0 80px rgba(0, 255, 255, 0.5),
+                                    inset 0 0 80px rgba(0, 255, 255, 0.2);
+                            }
+                        }
+                        
+                        @keyframes quantumSpin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                        
+                        @keyframes quantumPulse {
+                            0% { 
+                                transform: translate(-50%, -50%) scale(1);
+                                box-shadow: 
+                                    0 0 30px rgba(74, 144, 226, 0.8),
+                                    0 0 60px rgba(74, 144, 226, 0.4);
+                            }
+                            100% { 
+                                transform: translate(-50%, -50%) scale(1.2);
+                                box-shadow: 
+                                    0 0 50px rgba(74, 144, 226, 1),
+                                    0 0 100px rgba(74, 144, 226, 0.6);
+                            }
+                        }
+                        
+                        @keyframes quantumOrbit {
+                            0% { transform: translateX(-50%) rotate(0deg) translateX(90px) rotate(0deg); }
+                            100% { transform: translateX(-50%) rotate(360deg) translateX(90px) rotate(-360deg); }
+                        }
+                        
+                        @keyframes holographicGlow {
+                            0% { 
+                                text-shadow: 
+                                    0 0 10px rgba(0, 255, 255, 0.8),
+                                    0 0 20px rgba(0, 255, 255, 0.6),
+                                    0 0 30px rgba(0, 255, 255, 0.4);
+                            }
+                            100% { 
+                                text-shadow: 
+                                    0 0 20px rgba(0, 255, 255, 1),
+                                    0 0 40px rgba(0, 255, 255, 0.8),
+                                    0 0 60px rgba(0, 255, 255, 0.6),
+                                    0 0 80px rgba(255, 0, 128, 0.4);
+                            }
+                        }
+                        
+                        @keyframes typewriter {
+                            from { width: 0; }
+                            to { width: 100%; }
+                        }
+                        
+                        @keyframes quantumLoading {
+                            0% { width: 0%; }
+                            25% { width: 30%; }
+                            50% { width: 65%; }
+                            75% { width: 85%; }
+                            100% { width: 100%; }
+                        }
+                        
+                        @keyframes statusBlink {
+                            0%, 50% { opacity: 1; }
+                            51%, 100% { opacity: 0.6; }
+                        }
+                    </style>
+                </div>
+            `);
+            
+            // Enhanced auto-hide with quantum effects and interactive loading
+            let loadingProgress = 0;
+            const percentageElement = document.getElementById('quantumPercentage');
+            const statusMessages = [
+                '◉ QUANTUM ENTANGLEMENT ESTABLISHED',
+                '◉ NEURAL PATHWAYS SYNCHRONIZING',
+                '◉ DIMENSIONAL MATRIX CALIBRATING',
+                '◉ SPACE-TIME FABRIC STABILIZING',
+                '◉ QUANTUM TUNNELING INITIATED',
+                '◉ GALACTIC DATABASE CONNECTING',
+                '◉ COSMIC INTERFACE READY'
+            ];
+            
+            const loadingInterval = setInterval(() => {
+                loadingProgress += Math.random() * 15 + 5;
+                if (loadingProgress > 100) loadingProgress = 100;
+                
+                if (percentageElement) {
+                    percentageElement.textContent = Math.floor(loadingProgress) + '%';
+                }
+                
+                // Update status message based on progress
+                const statusElement = document.querySelector('[style*="statusBlink"]');
+                if (statusElement && loadingProgress < 100) {
+                    const messageIndex = Math.floor((loadingProgress / 100) * statusMessages.length);
+                    statusElement.textContent = statusMessages[messageIndex] || statusMessages[0];
+                }
+                
+                if (loadingProgress >= 100) {
+                    clearInterval(loadingInterval);
+                    if (statusElement) {
+                        statusElement.textContent = '◉ QUANTUM SPACE READY - WELCOME';
+                    }
+                }
+            }, 200);
+            
+            // Keyboard interaction (ESC to skip)
+            const handleKeyPress = (e) => {
+                if (e.key === 'Escape') {
+                    clearInterval(loadingInterval);
+                    const quantumPreloader = document.getElementById('quantumSpacePreloader');
+                    if (quantumPreloader) {
+                        quantumPreloader.style.animation = 'quantumDissolve 0.5s ease-out forwards';
+                        setTimeout(() => {
+                            quantumPreloader.remove();
+                            sessionStorage.setItem('quantumSpacePreloaderShown', 'true');
+                            document.body.style.overflow = '';
+                            document.removeEventListener('keydown', handleKeyPress);
+                        }, 500);
+                    }
+                }
+            };
+            document.addEventListener('keydown', handleKeyPress);
+            
+            setTimeout(() => {
+                clearInterval(loadingInterval);
+                const quantumPreloader = document.getElementById('quantumSpacePreloader');
+                if (quantumPreloader) {
+                    // Add quantum dissolution effect
+                    quantumPreloader.style.animation = 'quantumDissolve 1s ease-out forwards';
+                    quantumPreloader.style.filter = 'blur(0px)';
+                    
+                    // Add dissolution keyframe
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes quantumDissolve {
+                            0% { 
+                                opacity: 1; 
+                                transform: scale(1);
+                                filter: blur(0px);
+                            }
+                            50% { 
+                                opacity: 0.5; 
+                                transform: scale(1.1);
+                                filter: blur(2px);
+                            }
+                            100% { 
+                                opacity: 0; 
+                                transform: scale(1.2);
+                                filter: blur(10px);
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    setTimeout(() => {
+                        quantumPreloader.remove();
+                        sessionStorage.setItem('quantumSpacePreloaderShown', 'true');
+                        document.body.style.overflow = '';
+                        document.removeEventListener('keydown', handleKeyPress);
+                        console.log('🌌 Quantum Space Preloader: Mission Complete');
+                    }, 1000);
+                }
+            }, 5000); // Show for 5 seconds for the full experience
+        }
+    </script>
+    
+    <!-- Debug functions for testing the quantum preloader -->
+    <script>
+        // Function to clear quantum preloader session for testing
+        window.clearQuantumPreloaderSession = function() {
+            sessionStorage.removeItem('quantumSpacePreloaderShown');
+            console.log('🌌 Quantum preloader session cleared. Refresh the index page to see preloader again.');
+        };
+        
+        // Function to force show quantum preloader (only works on index page)
+        window.forceShowQuantumPreloader = function() {
+            const checkIsIndexPage = window.location.pathname === '/' || window.location.pathname.includes('index');
+            if (checkIsIndexPage) {
+                sessionStorage.removeItem('quantumSpacePreloaderShown');
+                location.reload();
+            } else {
+                console.log('⚠️ Quantum preloader only shows on the index page. Navigate to index page first.');
+            }
+        };
+        
+        // Log session status
+        const currentIsIndexPage = window.location.pathname === '/' || window.location.pathname.includes('index');
+        const quantumPreloaderShown = sessionStorage.getItem('quantumSpacePreloaderShown');
+        
+        if (currentIsIndexPage) {
+            console.log('🚀 Quantum Preloader Status:', quantumPreloaderShown ? 'Already shown this session' : 'Will show on this page');
+        } else {
+            console.log('📍 Current page: Not index page - Quantum preloader will not show');
+        }
+    </script>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-progress" id="scrollProgress"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') if url_for else '#' }}">
+                <i class="fas fa-satellite me-2"></i>
+                Cosmopedia
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') if url_for else '#' }}" title="Home" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-home"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('terminologies') if url_for else '#terminologies' }}" title="Terminologies" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-book"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('agencies') if url_for else '#agencies' }}" title="Space Agencies" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-building"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('planets') if url_for else '#planets' }}" title="Planets" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('rockets') if url_for else '#rockets' }}" title="Rockets" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-rocket"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('astronauts') if url_for else '#astronauts' }}" title="Astronauts" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-user-astronaut"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('telescopes') if url_for else '#telescopes' }}" title="Telescopes" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-binoculars"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('museums') if url_for else '#museums' }}" title="Space Museums" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-university"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('notable_people') if url_for else '#notable-people' }}" title="Notable People" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-users"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('images') if url_for else '#images' }}" title="Images" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-images"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('chat') if url_for else '#chat' }}" title="AI Chat" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-brain"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center">
+                        <h1 class="hero-title">Cosmopedia</h1>
+                        <p class="hero-subtitle mb-4">
+                            Unified data from multiple data sources about space exploration, astronomy, and cosmic discoveries
+                        </p>
+                        
+                        <!-- Documentation and GitHub Buttons -->
+                        <div class="documentation-buttons mb-4">
+                            <button type="button" class="btn btn-outline-info me-3" data-bs-toggle="modal" data-bs-target="#documentationModal">
+                                <i class="fas fa-file-alt me-2"></i>Platform Documentation
+                            </button>
+                            <a href="https://github.com/aradhyapavan/space_unified_api" target="_blank" class="btn btn-outline-success">
+                                <i class="fab fa-github me-2"></i>GitHub API Documentation
+                            </a>
+                        </div>
+                        
+                        <div class="hero-buttons">
+                            <a href="{{ url_for('terminologies') if url_for else '#terminologies' }}" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-book me-2"></i>Explore Terminologies
+                            </a>
+                            <a href="{{ url_for('agencies') if url_for else '#agencies' }}" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-building me-2"></i>View Agencies
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 text-center glow-on-hover">
+                            <div class="card-body">
+                                <i class="fas fa-book feature-icon"></i>
+                                <h5 class="card-title">Space Terminologies</h5>
+                                <p class="card-text">Explore comprehensive space terminology and definitions with detailed explanations and scientific context.</p>
+                                <a href="{{ url_for('terminologies') if url_for else '#terminologies' }}" class="btn btn-primary btn-sm">Explore</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 text-center glow-on-hover">
+                            <div class="card-body">
+                                <i class="fas fa-building feature-icon"></i>
+                                <h5 class="card-title">Space Agencies</h5>
+                                <p class="card-text">Discover space agencies from around the world, from government organizations to private companies.</p>
+                                <a href="{{ url_for('agencies') if url_for else '#agencies' }}" class="btn btn-primary btn-sm">Discover</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 text-center glow-on-hover">
+                            <div class="card-body">
+                                <i class="fas fa-globe feature-icon"></i>
+                                <h5 class="card-title">Planets</h5>
+                                <p class="card-text">Learn about the planets in our solar system with scientific data and stunning visuals.</p>
+                                <a href="{{ url_for('planets') if url_for else '#planets' }}" class="btn btn-primary btn-sm">Learn</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <div class="credit-box">
+                        <small>
+                            <i class="fas fa-code me-1"></i>
+                            Designed and Developed by Aradhya Pavan H S
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Documentation Modal -->
+    <div class="modal fade" id="documentationModal" tabindex="-1" aria-labelledby="documentationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="documentationModalLabel">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Cosmopedia Documentation
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="documentation-content">
+                        <!-- Introduction Section -->
+                        <section class="mb-4">
+                            <h4 class="text-primary">
+                                <i class="fas fa-satellite me-2"></i>
+                                Welcome to Cosmopedia
+                            </h4>
+                            <p>Cosmopedia is a comprehensive platform that provides unified data from multiple sources about space exploration, astronomy, and cosmic discoveries. Our platform aggregates information about space agencies, planets, rockets, astronauts, telescopes, and more.</p>
+                        </section>
+
+                        <!-- Features Section -->
+                        <section class="mb-4">
+                            <h4 class="text-primary">
+                                <i class="fas fa-star me-2"></i>
+                                Platform Features
+                            </h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-book text-info me-2"></i>
+                                            <strong>Space Terminologies:</strong> Comprehensive glossary of space-related terms
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-building text-info me-2"></i>
+                                            <strong>Space Agencies:</strong> Information about global space organizations
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-globe text-info me-2"></i>
+                                            <strong>Solar System:</strong> Detailed data about planets and celestial bodies
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-rocket text-info me-2"></i>
+                                            <strong>Rockets & Launch Vehicles:</strong> Launch vehicle specifications and history
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-user-astronaut text-info me-2"></i>
+                                            <strong>Astronauts:</strong> Profiles of space explorers and their missions
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-binoculars text-info me-2"></i>
+                                            <strong>Telescopes:</strong> Space and ground-based observation instruments
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Navigation Guide -->
+                        <section class="mb-4">
+                            <h4 class="text-primary">
+                                <i class="fas fa-compass me-2"></i>
+                                Navigation Guide
+                            </h4>
+                            <div class="alert alert-info">
+                                <strong>Quick Navigation:</strong> Use the navigation bar at the top to access different sections. Each icon represents a specific category of space information.
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-home fa-2x mb-2 text-primary"></i>
+                                            <h6>Home</h6>
+                                            <small>Main dashboard with overview</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-body text-center">
+                                            <img src="https://img.icons8.com/stickers/100/bard.png" alt="AI" style="width: 48px; height: 48px; filter: brightness(0) invert(1); margin-bottom: 0.5rem;">
+                                            <h6>AI Chat</h6>
+                                            <small>Interactive space knowledge assistant</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-images fa-2x mb-2 text-primary"></i>
+                                            <h6>Space Images</h6>
+                                            <small>Stunning space photography collection</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Technical Information -->
+                        <section class="mb-4">
+                            <h4 class="text-primary">
+                                <i class="fas fa-cogs me-2"></i>
+                                Technical Information
+                            </h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-secondary">Data Sources:</h6>
+                                    <ul class="small">
+                                        <li>NASA Open Data Portal</li>
+                                        <li>ESA (European Space Agency)</li>
+                                        <li>Space agencies worldwide</li>
+                                        <li>Astronomical databases</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-secondary">Technologies Used:</h6>
+                                    <ul class="small">
+                                        <li>Flask (Python Web Framework)</li>
+                                        <li>Bootstrap 5 (UI Framework)</li>
+                                        <li>Vector Search & AI Integration</li>
+                                        <li>Responsive Design</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Contact Information -->
+                        <section class="mb-4">
+                            <h4 class="text-primary">
+                                <i class="fas fa-envelope me-2"></i>
+                                Contact & Support
+                            </h4>
+                            <div class="alert alert-dark">
+                                <p class="mb-2">
+                                    <strong>Developer:</strong> Aradhya Pavan H S
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    For technical support or feature requests, please contact the development team.
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-github me-2"></i>
+                                    This project is part of ongoing space technology initiatives.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- Version Information -->
+                        <section>
+                            <h4 class="text-primary">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Version Information
+                            </h4>
+                            <div class="text-muted small">
+                                <p>Cosmopedia Platform v2.0</p>
+                                <p>Last Updated: July 2025</p>
+                                <p>Platform Status: Active Development</p>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="static/js/space-theme.js"></script>
+    
+    <!-- Ultimate Space Preloader -->
+    <script src="static/js/preloader-clean.js"></script>
+    
+    <!-- Initialize tooltips and other scripts -->
+    <script>
+        // Scroll progress indicator
+        window.addEventListener('scroll', function() {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            scrollProgress.style.width = scrollPercent + '%';
+        });
+        
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+        
+        // Enhanced modal functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event listener to documentation button
+            const docButton = document.querySelector('[data-bs-target="#documentationModal"]');
+            if (docButton) {
+                docButton.addEventListener('click', function(e) {
+                    console.log('Documentation button clicked');
+                    console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+                    console.log('Modal element exists:', document.getElementById('documentationModal') !== null);
+                    
+                    // Manual trigger as backup
+                    const modal = document.getElementById('documentationModal');
+                    if (modal && typeof bootstrap !== 'undefined') {
+                        const bsModal = new bootstrap.Modal(modal);
+                        bsModal.show();
+                    }
+                });
+            }
+            
+            // Ensure preloader doesn't interfere with modal interactions
+            const modal = document.getElementById('documentationModal');
+            if (modal) {
+                modal.addEventListener('shown.bs.modal', function() {
+                    // Ensure preloader is hidden when modal is shown
+                    const preloader = document.getElementById('spacePreloader');
+                    if (preloader) {
+                        preloader.style.display = 'none';
+                    }
+                });
+                
+                modal.addEventListener('hidden.bs.modal', function() {
+                    // Ensure page remains interactive after modal close
+                    document.body.style.overflow = '';
+                    document.body.style.pointerEvents = '';
+                    
+                    // Remove any modal backdrop that might persist
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(backdrop => backdrop.remove());
+                    
+                    // Ensure no preloader appears after modal close
+                    const preloader = document.getElementById('spacePreloader');
+                    if (preloader) {
+                        preloader.remove();
+                    }
+                    
+                    // Call global clear function if available
+                    if (window.clearPreloader) {
+                        window.clearPreloader();
+                    }
+                });
+            }
+            
+            // Add magnetic effect to navigation items
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.05)';
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+            
+            // Add smooth scroll behavior
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <!-- Performance Optimization JS -->
+    <script src="static/js/performance.js"></script>
+    
+    <!-- Immediate fix for scroll issues - runs as early as possible -->
+    <script>
+        // CRITICAL: Immediate restoration of scroll functionality
+        (function() {
+            // Force restore scroll immediately
+            function restoreScroll() {
+                document.documentElement.style.overflow = 'auto';
+                document.body.style.overflow = 'auto';
+                document.body.style.pointerEvents = 'auto';
+                document.body.classList.remove('preloader-active');
+            }
+            
+            // Run immediately
+            restoreScroll();
+            
+            // Run after a short delay
+            setTimeout(restoreScroll, 100);
+            
+            // Run when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', restoreScroll);
+            } else {
+                restoreScroll();
+            }
+            
+            // Global emergency function
+            window.emergencyScrollFix = restoreScroll;
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,515 @@
+{% extends "base.html" %}
+
+{% block title %}Astronauts - Cosmopedia{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding-top: 100px; max-width: 1400px;">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="text-gradient mb-3">
+                    <i class="fas fa-user-astronaut me-3"></i>Astronauts & Cosmonauts
+                </h1>
+                <p class="lead text-light">Meet the brave explorers who venture into space</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-10">
+            <div class="card bg-glass border-0 p-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-0 text-primary">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="astronautSearch" class="form-control bg-dark border-0 text-light" 
+                                   placeholder="Search astronauts..." style="box-shadow: none;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="countryFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Countries</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="typeFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Types</option>
+                            <option value="government">Government</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="clearFilters" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-times me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading astronauts...</p>
+    </div>
+
+    <!-- Results Count -->
+    <div id="resultsCount" class="text-center mb-4" style="display: none;">
+        <p class="text-muted">Found <span id="astronautCount">0</span> astronaut(s)</p>
+    </div>
+
+    <!-- Astronauts Grid -->
+    <div id="astronautsGrid" class="row g-4" style="display: none;">
+        <!-- Astronauts will be loaded here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <div class="empty-state">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No Astronauts Found</h4>
+            <p>Try adjusting your search criteria or filters.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Astronaut Detail Modal -->
+<div class="modal fade" id="astronautModal" tabindex="-1" aria-labelledby="astronautModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: rgba(20, 25, 40, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light" id="astronautModalLabel">Astronaut Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-light">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img id="modalAstronautImage" src="" alt="" class="img-fluid rounded mb-3" style="max-height: 250px; width: 100%; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="modalAstronautName" class="text-primary mb-3"></h4>
+                        <p id="modalAstronautDescription" class="mb-3"></p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Agency:</strong>
+                                <span id="modalAstronautAgency"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Country:</strong>
+                                <span id="modalAstronautCountry"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Birth Year:</strong>
+                                <span id="modalAstronautBirthYear"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Birth Place:</strong>
+                                <span id="modalAstronautBirthPlace"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Missions:</strong>
+                                <span id="modalAstronautMissions" class="badge bg-primary ms-2"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Space Time:</strong>
+                                <span id="modalAstronautSpaceTime"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Spacewalks:</strong>
+                            <span id="modalAstronautSpacewalks"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="text-primary">Notable Missions</h6>
+                    <ul id="modalAstronautNotableMissions" class="list-unstyled">
+                        <!-- Missions will be loaded here -->
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="text-primary">Achievements</h6>
+                    <ul id="modalAstronautAchievements" class="list-unstyled">
+                        <!-- Achievements will be loaded here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allAstronauts = [];
+let filteredAstronauts = [];
+
+// Load astronauts data
+async function loadAstronauts() {
+    try {
+        const response = await fetch('/api/astronauts');
+        const data = await response.json();
+        allAstronauts = data;  // API returns the array directly
+        filteredAstronauts = [...allAstronauts];
+        
+        // Populate filter dropdowns
+        populateCountryFilter();
+        
+        // Hide loading, show content
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('astronautsGrid').style.display = 'flex';
+        document.getElementById('astronautsGrid').style.flexWrap = 'wrap';
+        document.getElementById('resultsCount').style.display = 'block';
+        
+        renderAstronauts();
+    } catch (error) {
+        console.error('Error loading astronauts:', error);
+        document.getElementById('loadingState').innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h4>Error Loading Astronauts</h4>
+                <p>Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+// Populate country filter with unique countries from data
+function populateCountryFilter() {
+    const countryFilter = document.getElementById('countryFilter');
+    const countries = [...new Set(allAstronauts.map(astronaut => astronaut.country))].sort();
+    
+    // Clear existing options except "All Countries"
+    while (countryFilter.children.length > 1) {
+        countryFilter.removeChild(countryFilter.lastChild);
+    }
+    
+    // Add countries from data
+    countries.forEach(country => {
+        if (country) {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
+        }
+    });
+}
+
+// Render astronauts grid
+function renderAstronauts() {
+    const grid = document.getElementById('astronautsGrid');
+    const countElement = document.getElementById('astronautCount');
+    const emptyState = document.getElementById('emptyState');
+    
+    countElement.textContent = filteredAstronauts.length;
+    
+    if (filteredAstronauts.length === 0) {
+        grid.style.display = 'none';
+        emptyState.style.display = 'block';
+        document.getElementById('resultsCount').style.display = 'none';
+        return;
+    }
+    
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    emptyState.style.display = 'none';
+    document.getElementById('resultsCount').style.display = 'block';
+    
+    grid.innerHTML = filteredAstronauts.map(astronaut => `
+        <div class="col-4">
+            <div class="card astronaut-card glow-on-hover h-100" onclick="showAstronautDetails('${astronaut.id}')" style="cursor: pointer; min-height: 500px;">
+                <div class="position-relative">
+                    <img src="${astronaut.photo_url}" 
+                         class="card-img-top astronaut-image" 
+                         alt="${astronaut.name}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                         style="height: 220px; object-fit: cover; object-position: center 25%; border-radius: 12px 12px 0 0;">
+                    <div class="d-none align-items-center justify-content-center bg-glass" style="height: 220px; border-radius: 12px 12px 0 0;">
+                        <i class="fas fa-user-astronaut fa-3x text-muted"></i>
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge bg-primary fs-6">${astronaut.type}</span>
+                    </div>
+                    <div class="position-absolute top-0 start-0 m-3">
+                        <span class="badge bg-success fs-6">${astronaut.missions_count} missions</span>
+                    </div>
+                </div>
+                
+                <div class="card-body d-flex flex-column p-4">
+                    <h5 class="card-title text-center mb-3 text-primary">${astronaut.name}</h5>
+                    <p class="card-text flex-grow-1 text-light mb-3">${astronaut.description ? astronaut.description.substring(0, 85) + '...' : 'A brave space explorer who has contributed to human spaceflight.'}</p>
+                    
+                    <div class="astronaut-stats mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-flag me-1"></i>Country:
+                            </small>
+                            <small class="text-light">${astronaut.country}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-building me-1"></i>Agency:
+                            </small>
+                            <small class="text-light">${astronaut.agency.length > 20 ? astronaut.agency.substring(0, 20) + '...' : astronaut.agency}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>Born:
+                            </small>
+                            <small class="text-light">${astronaut.birth_year}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-rocket me-1"></i>Missions:
+                            </small>
+                            <small class="text-light">${astronaut.missions_count}</small>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-sm mt-auto">
+                        <i class="fas fa-info-circle me-1"></i>Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Show astronaut details in modal
+function showAstronautDetails(astronautId) {
+    const astronaut = allAstronauts.find(a => a.id === astronautId);
+    if (!astronaut) return;
+    
+    // Set modal content
+    document.getElementById('modalAstronautName').textContent = astronaut.name;
+    document.getElementById('modalAstronautDescription').textContent = astronaut.description || 'No description available.';
+    document.getElementById('modalAstronautAgency').textContent = astronaut.agency || 'Unknown';
+    document.getElementById('modalAstronautCountry').textContent = astronaut.country || 'Unknown';
+    document.getElementById('modalAstronautBirthYear').textContent = astronaut.birth_year || 'Unknown';
+    document.getElementById('modalAstronautBirthPlace').textContent = astronaut.birth_place || 'Unknown';
+    document.getElementById('modalAstronautMissions').textContent = astronaut.missions_count || '0';
+    document.getElementById('modalAstronautSpaceTime').textContent = astronaut.total_space_time || 'Unknown';
+    document.getElementById('modalAstronautSpacewalks').textContent = astronaut.spacewalks || '0';
+    
+    // Set image
+    const modalImage = document.getElementById('modalAstronautImage');
+    
+    if (astronaut.photo_url) {
+        modalImage.src = astronaut.photo_url;
+        modalImage.alt = astronaut.name;
+        modalImage.style.display = 'block';
+        
+        modalImage.onerror = function() {
+            modalImage.style.display = 'none';
+        };
+    } else {
+        modalImage.style.display = 'none';
+    }
+    
+    // Set notable missions
+    const missionsElement = document.getElementById('modalAstronautNotableMissions');
+    if (astronaut.notable_missions && astronaut.notable_missions.length > 0) {
+        missionsElement.innerHTML = astronaut.notable_missions.map(mission => 
+            `<li><i class="fas fa-rocket text-warning me-2"></i>${mission}</li>`
+        ).join('');
+    } else {
+        missionsElement.innerHTML = '<li class="text-muted">No notable missions listed</li>';
+    }
+    
+    // Set achievements
+    const achievementsElement = document.getElementById('modalAstronautAchievements');
+    if (astronaut.achievements && astronaut.achievements.length > 0) {
+        achievementsElement.innerHTML = astronaut.achievements.map(achievement => 
+            `<li><i class="fas fa-trophy text-warning me-2"></i>${achievement}</li>`
+        ).join('');
+    } else {
+        achievementsElement.innerHTML = '<li class="text-muted">No achievements listed</li>';
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('astronautModal'));
+    modal.show();
+}
+
+// Filter and search functionality
+function applyFilters() {
+    const searchTerm = document.getElementById('astronautSearch').value.toLowerCase();
+    const countryFilter = document.getElementById('countryFilter').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    
+    filteredAstronauts = allAstronauts.filter(astronaut => {
+        const matchesSearch = !searchTerm || 
+            astronaut.name.toLowerCase().includes(searchTerm) ||
+            (astronaut.description && astronaut.description.toLowerCase().includes(searchTerm)) ||
+            (astronaut.country && astronaut.country.toLowerCase().includes(searchTerm)) ||
+            (astronaut.agency && astronaut.agency.toLowerCase().includes(searchTerm));
+        
+        const matchesCountry = !countryFilter || 
+            astronaut.country === countryFilter;
+        
+        const matchesType = !typeFilter || 
+            (astronaut.type && astronaut.type.toLowerCase().includes(typeFilter.toLowerCase()));
+        
+        return matchesSearch && matchesCountry && matchesType;
+    });
+    
+    renderAstronauts();
+}
+
+// Event listeners
+document.getElementById('astronautSearch').addEventListener('input', applyFilters);
+document.getElementById('countryFilter').addEventListener('change', applyFilters);
+document.getElementById('typeFilter').addEventListener('change', applyFilters);
+document.getElementById('clearFilters').addEventListener('click', () => {
+    document.getElementById('astronautSearch').value = '';
+    document.getElementById('countryFilter').value = '';
+    document.getElementById('typeFilter').value = '';
+    applyFilters();
+});
+
+// Load astronauts on page load
+document.addEventListener('DOMContentLoaded', loadAstronauts);
+</script>
+
+<style>
+#astronautsGrid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+}
+
+.col-4 {
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+    margin-bottom: 24px !important;
+}
+
+.astronaut-card {
+    background: rgba(20, 25, 40, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.astronaut-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 123, 255, 0.3);
+    border-color: rgba(0, 123, 255, 0.5);
+}
+
+.astronaut-image {
+    height: 220px;
+    object-fit: cover;
+    object-position: center 25%;
+    border-radius: 12px 12px 0 0;
+}
+
+.astronaut-stats {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-glass {
+    background: rgba(20, 25, 40, 0.7);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.form-control.bg-dark::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-select.bg-dark option {
+    background: rgba(20, 25, 40, 0.95);
+    color: white;
+}
+
+.empty-state {
+    padding: 4rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.text-gradient {
+    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glow-on-hover:hover {
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Card improvements */
+.card-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.badge.fs-6 {
+    font-size: 0.875rem !important;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.btn-outline-primary {
+    border: 2px solid #007bff;
+    color: #007bff;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: #007bff;
+    border-color: #007bff;
+    transform: translateY(-2px);
+}
+
+.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+.bg-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3) !important;
+}
+</style>
+{% endblock %}

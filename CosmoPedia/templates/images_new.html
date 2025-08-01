@@ -1,0 +1,767 @@
+{% extends "base.html" %}
+
+{% block title %}Space Images - Cosmopedia{% endblock %}
+
+{% block extra_css %}
+<!-- jQuery Library -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Magnific Popup for Better Image Zoom -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        padding: 4rem 0 2rem;
+        color: white;
+        position: relative;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="200" cy="100" r="1" fill="white" opacity="0.3"/><circle cx="800" cy="150" r="1.5" fill="white" opacity="0.4"/><circle cx="400" cy="50" r="1" fill="white" opacity="0.5"/></svg>');
+        animation: twinkle 3s ease-in-out infinite;
+    }
+    
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+    }
+    
+    /* Source Cards Styles */
+    .source-card {
+        transition: all 0.4s ease;
+        border: none;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        cursor: pointer;
+        position: relative;
+        height: 220px;
+    }
+    
+    .source-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0, 102, 204, 0.4);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+    }
+    
+    .source-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 128, 0.1));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .source-card:hover::before {
+        opacity: 1;
+    }
+    
+    .source-card .card-body {
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .source-logo {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #0066cc;
+        transition: all 0.3s ease;
+    }
+    
+    .source-card:hover .source-logo {
+        transform: scale(1.1);
+        color: #00ffff;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    }
+    
+    .source-card .card-title {
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        letter-spacing: 0.1rem;
+    }
+    
+    .source-card .card-text {
+        color: #ccc;
+        font-size: 0.9rem;
+    }
+    
+    .search-controls {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .image-card {
+        transition: all 0.3s ease;
+        border: none;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        cursor: pointer;
+    }
+    
+    .image-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 102, 204, 0.3);
+    }
+    
+    .image-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .image-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .image-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .image-card .card-title {
+        color: #0066cc;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .image-card .card-text {
+        color: #e8e8e8;
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .image-meta {
+        font-size: 0.8rem;
+        color: #aaa;
+        margin-top: 0.5rem;
+    }
+    
+    .image-meta .badge {
+        background: rgba(0, 102, 204, 0.2);
+        color: #0066cc;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .back-button {
+        background: rgba(0, 102, 204, 0.2);
+        border: 1px solid #0066cc;
+        color: #0066cc;
+        padding: 10px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+    }
+    
+    .back-button:hover {
+        background: #0066cc;
+        color: #fff;
+        transform: translateX(-5px);
+    }
+    
+    .view-section {
+        display: none;
+    }
+    
+    .view-section.active {
+        display: block;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #aaa;
+        display: none;
+    }
+    
+    /* Custom Magnific Popup Styles */
+    .mfp-bg {
+        background: rgba(0, 0, 0, 0.9);
+    }
+    
+    .mfp-image-holder .mfp-content {
+        background: rgba(16, 16, 30, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    
+    .image-download-btn {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 102, 204, 0.8);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        z-index: 9999;
+        transition: all 0.3s ease;
+    }
+    
+    .image-download-btn:hover {
+        background: #0066cc;
+        transform: scale(1.05);
+    }
+    
+    .keyword-tag {
+        display: inline-block;
+        background: rgba(255, 210, 63, 0.2);
+        color: #ffd23f;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1><i class="fas fa-images me-3"></i>Space Images</h1>
+                <p class="lead" id="pageSubtitle">Explore stunning space images from multiple sources and discover the wonders of our universe</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Source Selection View -->
+    <div id="sourceSelectionView" class="view-section active">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-3">Choose a Source</h2>
+                <p class="text-muted">Select a space source to explore their image collection</p>
+            </div>
+        </div>
+        
+        <!-- Source Cards -->
+        <div class="row justify-content-center">
+            <!-- NASA Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card source-card" onclick="selectSource('nasa')">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3 class="card-title">NASA</h3>
+                        <p class="card-text">National Aeronautics and Space Administration - Leading space exploration and scientific discovery</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ESA Card (Coming Soon) -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card source-card" style="opacity: 0.6; cursor: not-allowed;">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-satellite"></i>
+                        </div>
+                        <h3 class="card-title">ESA</h3>
+                        <p class="card-text">European Space Agency - Europe's gateway to space exploration and satellite technology</p>
+                        <small class="text-muted">Coming Soon</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SpaceX Card (Coming Soon) -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card source-card" style="opacity: 0.6; cursor: not-allowed;">
+                    <div class="card-body">
+                        <div class="source-logo">
+                            <i class="fas fa-space-shuttle"></i>
+                        </div>
+                        <h3 class="card-title">SpaceX</h3>
+                        <p class="card-text">Space Exploration Technologies - Private space company revolutionizing space travel</p>
+                        <small class="text-muted">Coming Soon</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Images View -->
+    <div id="imagesView" class="view-section">
+        <!-- Back Button -->
+        <button class="btn back-button" onclick="backToSources()">
+            <i class="fas fa-arrow-left me-2"></i>Back to Sources
+        </button>
+        
+        <!-- Search Controls -->
+        <div class="search-controls">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchInput" class="form-label">Search Images</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search for space images...">
+                </div>
+                <div class="col-md-3">
+                    <label for="yearFilter" class="form-label">Year</label>
+                    <select class="form-select" id="yearFilter">
+                        <option value="">All Years</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                        <option value="2019">2019</option>
+                        <option value="2018">2018</option>
+                        <option value="2017">2017</option>
+                        <option value="2016">2016</option>
+                        <option value="2015">2015</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="sourceFilter" class="form-label">Source</label>
+                    <select class="form-select" id="sourceFilter">
+                        <option value="">All Sources</option>
+                        <option value="NASA">NASA</option>
+                        <option value="ESA">ESA</option>
+                        <option value="SpaceX">SpaceX</option>
+                        <option value="Blue Origin">Blue Origin</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary w-100" onclick="searchImages()">
+                        <i class="fas fa-search me-1"></i>Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <span id="resultsCount" class="text-muted">Loading images...</span>
+            </div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetSearch()">
+                    <i class="fas fa-refresh me-1"></i>Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner" style="text-align: center; display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading space images...</p>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5>No images found</h5>
+            <p>Try adjusting your search criteria or browse all images.</p>
+        </div>
+
+        <!-- Images Grid -->
+        <div class="row" id="imagesGrid">
+            <!-- Images will be loaded here -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper" id="paginationWrapper" style="display: none;">
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination will be loaded here -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+let totalPages = 1;
+let currentQuery = '';
+let currentYear = '';
+let currentSource = '';
+let selectedSource = '';
+
+// Load initial view
+$(document).ready(function() {
+    showSourceSelection();
+    
+    // Initialize Magnific Popup for images
+    initializeMagnificPopup();
+    
+    // Enter key search
+    $('#searchInput').on('keypress', function(e) {
+        if (e.which === 13) {
+            searchImages();
+        }
+    });
+});
+
+// Source Selection Functions
+function selectSource(source) {
+    selectedSource = source;
+    currentSource = source.toUpperCase();
+    
+    // Update page subtitle
+    $('#pageSubtitle').text(`Explore stunning ${source.toUpperCase()} images and discover the wonders of our universe`);
+    
+    // Set source filter
+    $('#sourceFilter').val(source.toUpperCase());
+    
+    // Show images view
+    showImagesView();
+    
+    // Load images for selected source
+    loadImages();
+}
+
+function backToSources() {
+    selectedSource = '';
+    currentSource = '';
+    resetSearch();
+    showSourceSelection();
+    
+    // Reset page subtitle
+    $('#pageSubtitle').text('Explore stunning space images from multiple sources and discover the wonders of our universe');
+}
+
+function showSourceSelection() {
+    $('#sourceSelectionView').addClass('active');
+    $('#imagesView').removeClass('active');
+}
+
+function showImagesView() {
+    $('#sourceSelectionView').removeClass('active');
+    $('#imagesView').addClass('active');
+}
+
+// Search function
+function searchImages() {
+    currentPage = 1;
+    currentQuery = $('#searchInput').val().trim();
+    currentYear = $('#yearFilter').val();
+    currentSource = $('#sourceFilter').val();
+    loadImages();
+}
+
+// Reset search
+function resetSearch() {
+    $('#searchInput').val('');
+    $('#yearFilter').val('');
+    $('#sourceFilter').val(selectedSource ? selectedSource.toUpperCase() : '');
+    currentPage = 1;
+    currentQuery = '';
+    currentYear = '';
+    currentSource = selectedSource ? selectedSource.toUpperCase() : '';
+    if (selectedSource) {
+        loadImages();
+    }
+}
+
+// Load images from API
+async function loadImages() {
+    showLoading();
+    
+    try {
+        const params = new URLSearchParams({
+            page: currentPage,
+            page_size: 20
+        });
+        
+        if (currentQuery) params.append('search', currentQuery);
+        if (currentYear) params.append('year', currentYear);
+        
+        const response = await fetch(`/api/images?${params}`);
+        const data = await response.json();
+        
+        hideLoading();
+        
+        if (data.items && data.items.length > 0) {
+            displayImages(data.items);
+            updateResultsCount(data.total);
+            updatePagination(data.total);
+            hideNoResults();
+            // Re-initialize popup after new images are loaded
+            initializeMagnificPopup();
+        } else {
+            showNoResults();
+            hideImagesGrid();
+        }
+    } catch (error) {
+        console.error('Error loading images:', error);
+        hideLoading();
+        showNoResults();
+    }
+}
+
+// Display images in grid
+function displayImages(images) {
+    const grid = $('#imagesGrid');
+    grid.empty();
+    
+    images.forEach(image => {
+        const imageCard = createImageCard(image);
+        grid.append(imageCard);
+    });
+}
+
+// Create image card
+function createImageCard(image) {
+    const formattedDate = image.date_created ? new Date(image.date_created).toLocaleDateString() : 'Unknown';
+    
+    const col = $(`
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 image-card">
+                <a href="${image.thumbnail}" class="image-popup" 
+                   data-title="${escapeHtml(image.title)}" 
+                   data-description="${escapeHtml(image.description)}"
+                   data-date="${formattedDate}"
+                   data-center="${image.center || ''}"
+                   data-keywords='${JSON.stringify(image.keywords || [])}'>
+                    <img src="${image.thumbnail}" alt="${escapeHtml(image.title)}" 
+                         onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">${escapeHtml(image.title)}</h5>
+                    <p class="card-text">${escapeHtml(image.description.substring(0, 100))}${image.description.length > 100 ? '...' : ''}</p>
+                    <div class="image-meta">
+                        <div class="mb-2">
+                            <small><i class="fas fa-calendar me-1"></i>${formattedDate}</small>
+                            ${image.center ? `<small class="ms-2"><i class="fas fa-building me-1"></i>${image.center}</small>` : ''}
+                        </div>
+                        <div>
+                            ${(image.keywords || []).slice(0, 3).map(keyword => `<span class="badge">${keyword}</span>`).join('')}
+                            ${(image.keywords || []).length > 3 ? `<span class="badge">+${(image.keywords || []).length - 3} more</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    return col;
+}
+
+// Initialize Magnific Popup for image zoom and download
+function initializeMagnificPopup() {
+    $('.image-popup').magnificPopup({
+        type: 'image',
+        closeOnContentClick: true,
+        closeBtnInside: false,
+        fixedContentPos: true,
+        mainClass: 'mfp-no-margins mfp-with-zoom',
+        image: {
+            verticalFit: true,
+            titleSrc: function(item) {
+                const title = item.el.data('title');
+                const description = item.el.data('description');
+                const date = item.el.data('date');
+                const center = item.el.data('center');
+                const keywords = item.el.data('keywords');
+                
+                let titleHTML = `<h5>${title}</h5>`;
+                if (description) titleHTML += `<p class="text-muted">${description}</p>`;
+                if (date) titleHTML += `<small><i class="fas fa-calendar me-1"></i>${date}</small>`;
+                if (center) titleHTML += `<small class="ms-2"><i class="fas fa-building me-1"></i>${center}</small>`;
+                
+                if (keywords && keywords.length > 0) {
+                    titleHTML += '<div class="mt-2">';
+                    keywords.forEach(keyword => {
+                        titleHTML += `<span class="keyword-tag">${keyword}</span>`;
+                    });
+                    titleHTML += '</div>';
+                }
+                
+                return titleHTML;
+            }
+        },
+        zoom: {
+            enabled: true,
+            duration: 300
+        },
+        callbacks: {
+            open: function() {
+                // Add download button
+                const downloadBtn = $(`
+                    <button class="image-download-btn" onclick="downloadCurrentImage()">
+                        <i class="fas fa-download me-1"></i>Download
+                    </button>
+                `);
+                $('.mfp-content').append(downloadBtn);
+                
+                // Store current image URL for download
+                window.currentImageUrl = this.currItem.src;
+                window.currentImageTitle = this.currItem.el.data('title');
+            }
+        }
+    });
+}
+
+// Download current image
+function downloadCurrentImage() {
+    if (window.currentImageUrl && window.currentImageTitle) {
+        const link = document.createElement('a');
+        link.href = window.currentImageUrl;
+        link.download = window.currentImageTitle + '.jpg';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show success message
+        showToast('Download started!', 'success');
+    }
+}
+
+// Toast notification function
+function showToast(message, type) {
+    const toast = $(`
+        <div class="alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed" 
+             style="top: 20px; right: 20px; z-index: 99999; min-width: 250px;">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+        </div>
+    `);
+    
+    $('body').append(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Update results count
+function updateResultsCount(total) {
+    $('#resultsCount').text(`Showing ${total} ${selectedSource ? selectedSource.toUpperCase() : ''} images`.trim());
+}
+
+// Update pagination
+function updatePagination(total) {
+    const itemsPerPage = 20;
+    totalPages = Math.ceil(total / itemsPerPage);
+    
+    const pagination = $('#pagination');
+    pagination.empty();
+    
+    if (totalPages <= 1) {
+        $('#paginationWrapper').hide();
+        return;
+    }
+    
+    $('#paginationWrapper').show();
+    
+    // Previous button
+    const prevDisabled = currentPage === 1 ? 'disabled' : '';
+    pagination.append(`
+        <li class="page-item ${prevDisabled}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>
+        </li>
+    `);
+    
+    // Page numbers
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const active = i === currentPage ? 'active' : '';
+        pagination.append(`
+            <li class="page-item ${active}">
+                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+            </li>
+        `);
+    }
+    
+    // Next button
+    const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+    pagination.append(`
+        <li class="page-item ${nextDisabled}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>
+        </li>
+    `);
+}
+
+// Change page
+function changePage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    loadImages();
+}
+
+// Utility functions
+function showLoading() {
+    $('#loadingSpinner').show();
+    $('#imagesGrid').hide();
+    $('#noResults').hide();
+}
+
+function hideLoading() {
+    $('#loadingSpinner').hide();
+    $('#imagesGrid').show();
+}
+
+function showNoResults() {
+    $('#noResults').show();
+    $('#paginationWrapper').hide();
+}
+
+function hideNoResults() {
+    $('#noResults').hide();
+}
+
+function hideImagesGrid() {
+    $('#imagesGrid').hide();
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+</script>
+{% endblock %}

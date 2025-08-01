@@ -1,0 +1,528 @@
+{% extends "base.html" %}
+
+{% block title %}Rockets & Launch Vehicles - Cosmopedia{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding-top: 100px; max-width: 1400px;">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="text-gradient mb-3">
+                    <i class="fas fa-rocket me-3"></i>Rockets & Launch Vehicles
+                </h1>
+                <p class="lead text-light">Explore the rockets that have shaped space exploration</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-10">
+            <div class="card bg-glass border-0 p-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-0 text-primary">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="rocketSearch" class="form-control bg-dark border-0 text-light" 
+                                   placeholder="Search rockets..." style="box-shadow: none;">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="countryFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Countries</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="operatorFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Operators</option>
+                            <option value="government">Government</option>
+                            <option value="private">Private</option>
+                            <option value="commercial">Commercial</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select id="statusFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Status</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="clearFilters" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-times me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading rockets...</p>
+    </div>
+
+    <!-- Results Count -->
+    <div id="resultsCount" class="text-center mb-4" style="display: none;">
+        <p class="text-muted">Found <span id="rocketCount">0</span> rocket(s)</p>
+    </div>
+
+    <!-- Rockets Grid -->
+    <div id="rocketsGrid" class="row g-4" style="display: none;">
+        <!-- Rockets will be loaded here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <div class="empty-state">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No Rockets Found</h4>
+            <p>Try adjusting your search criteria or filters.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Rocket Detail Modal -->
+<div class="modal fade" id="rocketModal" tabindex="-1" aria-labelledby="rocketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: rgba(20, 25, 40, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light" id="rocketModalLabel">Rocket Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-light">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img id="modalRocketImage" src="" alt="" class="img-fluid rounded mb-3" style="max-height: 250px; width: 100%; object-fit: cover; background: transparent !important; background-color: transparent !important;">
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="modalRocketName" class="text-primary mb-3"></h4>
+                        <p id="modalRocketDescription" class="mb-3"></p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Type:</strong>
+                                <span id="modalRocketType" class="badge bg-primary ms-2"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>First Flight:</strong>
+                                <span id="modalRocketFirstFlight"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Country:</strong>
+                                <span id="modalRocketCountry"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Status:</strong>
+                                <span id="modalRocketStatus"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Payload Capacity:</strong>
+                                <span id="modalRocketPayload"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Operator:</strong>
+                                <span id="modalRocketOperator"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Engine:</strong>
+                            <span id="modalRocketEngine"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Fuel:</strong>
+                            <span id="modalRocketFuel"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="text-primary">Purpose</h6>
+                    <p id="modalRocketPurpose" class="mb-3"></p>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="text-primary">Notable Missions</h6>
+                    <ul id="modalRocketMissions" class="list-unstyled">
+                        <!-- Missions will be loaded here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allRockets = [];
+let filteredRockets = [];
+
+// Load rockets data
+async function loadRockets() {
+    try {
+        const response = await fetch('/api/rockets');
+        const data = await response.json();
+        allRockets = data;  // API returns the array directly
+        filteredRockets = [...allRockets];
+        
+        // Populate filter dropdowns
+        populateCountryFilter();
+        
+        // Hide loading, show content
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('rocketsGrid').style.display = 'flex';
+        document.getElementById('rocketsGrid').style.flexWrap = 'wrap';
+        document.getElementById('resultsCount').style.display = 'block';
+        
+        renderRockets();
+    } catch (error) {
+        console.error('Error loading rockets:', error);
+        document.getElementById('loadingState').innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h4>Error Loading Rockets</h4>
+                <p>Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+// Populate country filter with unique countries from data
+function populateCountryFilter() {
+    const countryFilter = document.getElementById('countryFilter');
+    const countries = [...new Set(allRockets.map(rocket => rocket.country_of_origin))].sort();
+    
+    // Clear existing options except "All Countries"
+    while (countryFilter.children.length > 1) {
+        countryFilter.removeChild(countryFilter.lastChild);
+    }
+    
+    // Add countries from data
+    countries.forEach(country => {
+        if (country) {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = country;
+            countryFilter.appendChild(option);
+        }
+    });
+}
+
+// Render rockets grid
+function renderRockets() {
+    const grid = document.getElementById('rocketsGrid');
+    const countElement = document.getElementById('rocketCount');
+    const emptyState = document.getElementById('emptyState');
+    
+    countElement.textContent = filteredRockets.length;
+    
+    if (filteredRockets.length === 0) {
+        grid.style.display = 'none';
+        emptyState.style.display = 'block';
+        document.getElementById('resultsCount').style.display = 'none';
+        return;
+    }
+    
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    emptyState.style.display = 'none';
+    document.getElementById('resultsCount').style.display = 'block';
+    
+    grid.innerHTML = filteredRockets.map(rocket => `
+        <div class="col-4">
+            <div class="card rocket-card glow-on-hover h-100" onclick="showRocketDetails('${rocket.id}')" style="cursor: pointer; min-height: 500px;">
+                <div class="position-relative">
+                    <img src="${rocket.image_url}" 
+                         class="card-img-top rocket-image" 
+                         alt="${rocket.name}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                         style="height: 220px; object-fit: cover; border-radius: 12px 12px 0 0; background: transparent !important; background-color: transparent !important;">
+                    <div class="d-none align-items-center justify-content-center bg-glass" style="height: 220px; border-radius: 12px 12px 0 0;">
+                        <i class="fas fa-rocket fa-3x text-muted"></i>
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge bg-primary fs-6">${rocket.type.split(' ')[0]}</span>
+                    </div>
+                    <div class="position-absolute top-0 start-0 m-3">
+                        <span class="badge ${rocket.active ? 'bg-success' : 'bg-secondary'} fs-6">
+                            ${rocket.active ? 'Active' : 'Retired'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body d-flex flex-column p-4">
+                    <h5 class="card-title text-center mb-3 text-primary">${rocket.name}</h5>
+                    <p class="card-text flex-grow-1 text-light mb-3">${rocket.purpose ? rocket.purpose.substring(0, 85) + '...' : 'A significant rocket in space exploration history.'}</p>
+                    
+                    <div class="rocket-stats mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>First Flight:
+                            </small>
+                            <small class="text-light">${rocket.first_flight_year}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-flag me-1"></i>Country:
+                            </small>
+                            <small class="text-light">${rocket.country_of_origin}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-weight-hanging me-1"></i>Payload:
+                            </small>
+                            <small class="text-light">${rocket.capacity_payload_kg ? rocket.capacity_payload_kg.toLocaleString() + ' kg' : 'N/A'}</small>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-sm mt-auto">
+                        <i class="fas fa-info-circle me-1"></i>Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Show rocket details in modal
+function showRocketDetails(rocketId) {
+    const rocket = allRockets.find(r => r.id === rocketId);
+    if (!rocket) return;
+    
+    // Set modal content
+    document.getElementById('modalRocketName').textContent = rocket.name;
+    document.getElementById('modalRocketDescription').textContent = rocket.description || 'No description available.';
+    document.getElementById('modalRocketType').textContent = rocket.type || 'Unknown';
+    document.getElementById('modalRocketFirstFlight').textContent = rocket.first_flight_year || 'Unknown';
+    document.getElementById('modalRocketCountry').textContent = rocket.country_of_origin || 'Unknown';
+    
+    // Set status with proper badge styling
+    const statusElement = document.getElementById('modalRocketStatus');
+    const isActive = rocket.active;
+    const statusText = isActive ? 'Active' : 'Retired';
+    statusElement.innerHTML = `<span class="badge ${isActive ? 'bg-success' : 'bg-secondary'}" style="color: #ffffff !important; font-weight: 700 !important;">${statusText}</span>`;
+    
+    document.getElementById('modalRocketPayload').textContent = rocket.capacity_payload_kg ? rocket.capacity_payload_kg.toLocaleString() + ' kg' : 'Unknown';
+    document.getElementById('modalRocketOperator').textContent = rocket.operator || 'Unknown';
+    document.getElementById('modalRocketEngine').textContent = rocket.engine || 'Unknown';
+    document.getElementById('modalRocketFuel').textContent = rocket.fuel || 'Unknown';
+    document.getElementById('modalRocketPurpose').textContent = rocket.purpose || 'No purpose information available.';
+    
+    // Set image
+    const modalImage = document.getElementById('modalRocketImage');
+    
+    if (rocket.image_url) {
+        modalImage.src = rocket.image_url;
+        modalImage.alt = rocket.name;
+        modalImage.style.display = 'block';
+        
+        modalImage.onerror = function() {
+            modalImage.style.display = 'none';
+        };
+    } else {
+        modalImage.style.display = 'none';
+    }
+    
+    // Set notable missions
+    const missionsElement = document.getElementById('modalRocketMissions');
+    if (rocket.notable_missions && rocket.notable_missions.length > 0) {
+        missionsElement.innerHTML = rocket.notable_missions.map(mission => 
+            `<li><i class="fas fa-star text-warning me-2"></i>${mission}</li>`
+        ).join('');
+    } else {
+        missionsElement.innerHTML = '<li class="text-muted">No notable missions listed</li>';
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('rocketModal'));
+    modal.show();
+}
+
+// Filter and search functionality
+function applyFilters() {
+    const searchTerm = document.getElementById('rocketSearch').value.toLowerCase();
+    const countryFilter = document.getElementById('countryFilter').value;
+    const operatorFilter = document.getElementById('operatorFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    filteredRockets = allRockets.filter(rocket => {
+        const matchesSearch = !searchTerm || 
+            rocket.name.toLowerCase().includes(searchTerm) ||
+            (rocket.purpose && rocket.purpose.toLowerCase().includes(searchTerm)) ||
+            (rocket.type && rocket.type.toLowerCase().includes(searchTerm)) ||
+            (rocket.country_of_origin && rocket.country_of_origin.toLowerCase().includes(searchTerm)) ||
+            (rocket.operator && rocket.operator.toLowerCase().includes(searchTerm));
+        
+        const matchesCountry = !countryFilter || 
+            rocket.country_of_origin === countryFilter;
+        
+        const matchesOperator = !operatorFilter || 
+            (rocket.operator && rocket.operator.toLowerCase().includes(operatorFilter.toLowerCase()));
+        
+        const matchesStatus = !statusFilter || 
+            rocket.active.toString() === statusFilter;
+        
+        return matchesSearch && matchesCountry && matchesOperator && matchesStatus;
+    });
+    
+    renderRockets();
+}
+
+// Event listeners
+document.getElementById('rocketSearch').addEventListener('input', applyFilters);
+document.getElementById('countryFilter').addEventListener('change', applyFilters);
+document.getElementById('operatorFilter').addEventListener('change', applyFilters);
+document.getElementById('statusFilter').addEventListener('change', applyFilters);
+document.getElementById('clearFilters').addEventListener('click', () => {
+    document.getElementById('rocketSearch').value = '';
+    document.getElementById('countryFilter').value = '';
+    document.getElementById('operatorFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    applyFilters();
+});
+
+// Load rockets on page load
+document.addEventListener('DOMContentLoaded', loadRockets);
+</script>
+
+<style>
+#rocketsGrid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+}
+
+.col-4 {
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+    margin-bottom: 24px !important;
+}
+
+.rocket-card {
+    background: rgba(20, 25, 40, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.rocket-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 123, 255, 0.3);
+    border-color: rgba(0, 123, 255, 0.5);
+}
+
+.rocket-image {
+    height: 220px;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+}
+
+.rocket-stats {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-glass {
+    background: rgba(20, 25, 40, 0.7);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.form-control.bg-dark::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-select.bg-dark option {
+    background: rgba(20, 25, 40, 0.95);
+    color: white;
+}
+
+.empty-state {
+    padding: 4rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.text-gradient {
+    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glow-on-hover:hover {
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Card improvements */
+.card-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.badge.fs-6 {
+    font-size: 0.875rem !important;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.btn-outline-primary {
+    border: 2px solid #007bff;
+    color: #007bff;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: #007bff;
+    border-color: #007bff;
+    transform: translateY(-2px);
+}
+
+.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+.bg-secondary {
+    background: linear-gradient(45deg, #6c757d, #5a6268) !important;
+}
+</style>
+{% endblock %}

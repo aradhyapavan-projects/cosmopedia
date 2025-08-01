@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}Space Chat - Cosmopedia{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Override container-fluid for chat page */
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .chat-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        height: calc(100vh - 140px);
+        display: flex;
+        flex-direction: column;
+        margin-top: 80px; /* Account for fixed navbar */
+    }
+    
+    .chat-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white !important;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .chat-header h2 {
+        color: white !important;
+        margin-bottom: 10px;
+    }
+    
+    .chat-header p {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        scroll-behavior: smooth;
+    }
+    
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.5);
+        border-radius: 10px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 126, 234, 0.7);
+    }
+    
+    /* Ensure all message text is visible */
+    .message {
+        margin-bottom: 20px;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .message * {
+        text-shadow: none !important;
+    }
+    
+    /* Make sure user messages are always visible */
+    .message.user {
+        text-align: right;
+    }
+    
+    .message.user .message-bubble {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border-bottom-right-radius: 5px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        border: none;
+    }
+    
+    .message.user .message-bubble * {
+        color: white !important;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .message.assistant {
+        text-align: left;
+    }
+    
+    .message-bubble {
+        display: inline-block;
+        max-width: 70%;
+        padding: 15px 20px;
+        border-radius: 20px;
+        word-wrap: break-word;
+        word-break: break-word;
+        position: relative;
+        line-height: 1.4;
+        overflow-wrap: break-word;
+    }
+    
+    .message.assistant .message-bubble {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #e2e8f0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom-left-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .message.assistant .message-bubble * {
+        color: #e2e8f0 !important;
+    }
+    
+    .message-time {
+        font-size: 0.8em;
+        color: #a0aec0 !important;
+        margin-top: 5px;
+    }
+    
+    .context-indicator {
+        font-size: 0.7em;
+        color: #4ade80 !important;
+        margin-top: 3px;
+        font-style: italic;
+    }
+    
+    .chat-input-container {
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .chat-input-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .chat-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 500;
+        backdrop-filter: blur(15px);
+        transition: all 0.3s ease;
+    }
+    
+    .chat-input:focus {
+        outline: none;
+        border-color: #00b4ff;
+        box-shadow: 0 0 25px rgba(0, 180, 255, 0.4);
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .chat-input::placeholder {
+        color: #cbd5e0;
+        font-weight: 400;
+    }
+    
+    .send-button {
+        padding: 15px 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 80px;
+    }
+    
+    .send-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .send-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .typing-indicator {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 20px;
+        color: #a0aec0;
+        font-style: italic;
+    }
+    
+    .typing-dots {
+        display: flex;
+        gap: 4px;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #667eea;
+        border-radius: 50%;
+        animation: typing 1.5s infinite;
+    }
+    
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+        }
+        30% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    .welcome-message {
+        text-align: center;
+        color: #a0aec0;
+        padding: 40px 20px;
+        font-style: italic;
+    }
+    
+    .suggestion-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: center;
+    }
+    
+    .suggestion-chip {
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        color: #e2e8f0;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+    }
+    
+    .suggestion-chip:hover {
+        background: rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+        .chat-container {
+            height: calc(100vh - 120px);
+            margin-top: 70px;
+        }
+        
+        .message-bubble {
+            max-width: 85%;
+        }
+        
+        .chat-input-form {
+            flex-direction: row; /* Keep horizontal on mobile */
+            gap: 10px;
+        }
+        
+        .chat-input {
+            width: auto;
+            flex: 1;
+        }
+        
+        .suggestion-chips {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .chat-header {
+            padding: 15px;
+        }
+        
+        .chat-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="chat-container">
+        <div class="chat-header">
+                            <h2><img src="https://img.icons8.com/ios-filled/50/artificial-intelligence.png" alt="AI" style="width: 32px; height: 32px; filter: brightness(0) invert(1); margin-right: 0.5rem; vertical-align: middle;">Cosmopedia AI Assistant</h2>
+            <p class="mb-0">Explore unified space data from multiple sources - ask about planets, rockets, astronauts, and more!</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h4><i class="fas fa-rocket me-2"></i>Welcome to Space Chat!</h4>
+                <p>I'm your AI assistant for all things space exploration. I have access to comprehensive data about planets, rockets, astronauts, space agencies, telescopes, and space terminology.</p>
+                
+                <div class="suggestion-chips">
+                    <div class="suggestion-chip" onclick="sendSuggestion('Tell me about Mars')">
+                        <i class="fas fa-globe me-1"></i>Tell me about Mars
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('What are the different types of rockets?')">
+                        <i class="fas fa-rocket me-1"></i>Types of rockets
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('Who are some famous astronauts?')">
+                        <i class="fas fa-user-astronaut me-1"></i>Famous astronauts
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('What is the James Webb Space Telescope?')">
+                        <i class="fas fa-telescope me-1"></i>Space telescopes
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('How do space agencies collaborate?')">
+                        <i class="fas fa-handshake me-1"></i>Space agencies
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <span>AI is thinking</span>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <form class="chat-input-form" id="chatForm">
+                <input type="text" 
+                       class="chat-input" 
+                       id="messageInput" 
+                       placeholder="Ask me about space exploration..." 
+                       maxlength="500">
+                <button type="submit" class="send-button" id="sendButton">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let isTyping = false;
+
+document.getElementById('chatForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    
+    if (message && !isTyping) {
+        sendMessage(message);
+        messageInput.value = '';
+    }
+});
+
+function sendSuggestion(message) {
+    if (!isTyping) {
+        document.getElementById('messageInput').value = message;
+        sendMessage(message);
+    }
+}
+
+function sendMessage(message) {
+    const chatMessages = document.getElementById('chatMessages');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const sendButton = document.getElementById('sendButton');
+    const messageInput = document.getElementById('messageInput');
+    
+    // Hide welcome message if it exists
+    const welcomeMessage = chatMessages.querySelector('.welcome-message');
+    if (welcomeMessage) {
+        welcomeMessage.style.display = 'none';
+    }
+    
+    // Add user message
+    addMessage(message, 'user');
+    
+    // Show typing indicator and disable input
+    isTyping = true;
+    typingIndicator.style.display = 'flex';
+    sendButton.disabled = true;
+    messageInput.disabled = true;
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Send to API
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide typing indicator and enable input
+        typingIndicator.style.display = 'none';
+        sendButton.disabled = false;
+        messageInput.disabled = false;
+        isTyping = false;
+        
+        if (data.error) {
+            addMessage('Sorry, I encountered an error. Please try again.', 'assistant', false);
+        } else {
+            addMessage(data.response, 'assistant', data.context_used);
+        }
+        
+        // Focus input for next message
+        messageInput.focus();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        typingIndicator.style.display = 'none';
+        sendButton.disabled = false;
+        messageInput.disabled = false;
+        isTyping = false;
+        addMessage('Sorry, I encountered a network error. Please try again.', 'assistant', false);
+        messageInput.focus();
+    });
+}
+
+function addMessage(text, sender, contextUsed = false) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    let contextIndicator = '';
+    if (sender === 'assistant' && contextUsed) {
+        contextIndicator = '<div class="context-indicator"><i class="fas fa-database me-1"></i>Answer enhanced with knowledge base data</div>';
+    }
+    
+    messageDiv.innerHTML = `
+        <div class="message-bubble">
+            ${formatMessage(text)}
+        </div>
+        <div class="message-time">${timeString}</div>
+        ${contextIndicator}
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function formatMessage(text) {
+    // Convert markdown-style formatting to HTML
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>')
+        .replace(/`(.*?)`/g, '<code>$1</code>');
+}
+
+// Allow Enter to send message, Shift+Enter for new line
+document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey && !isTyping) {
+        e.preventDefault();
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    }
+});
+
+// Auto-focus input on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('messageInput').focus();
+});
+</script>
+{% endblock %}

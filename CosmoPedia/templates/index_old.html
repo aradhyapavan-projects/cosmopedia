@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Terminology Explorer</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Space Theme CSS -->
+    <link rel="stylesheet" href="static/css/space-theme.css">
+    
+    <style>
+        .alphabet-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .alphabet-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #0066cc;
+            background: transparent;
+            color: #0066cc;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .alphabet-btn:hover {
+            background: #0066cc;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
+        }
+        
+        .alphabet-btn.active {
+            background: #ff6b35;
+            border-color: #ff6b35;
+            color: white;
+        }
+        
+        .alphabet-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .alphabet-btn .count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffd23f;
+            color: #1a1a1a;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .term-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        
+        .term-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.3);
+            border-color: #0066cc;
+        }
+        
+        .term-title {
+            color: #ffd23f;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .term-category {
+            background: rgba(255, 107, 53, 0.2);
+            color: #ff6b35;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        
+        .term-description {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.3);
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.2rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="200" cy="300" r="2" fill="white" opacity="0.3"/><circle cx="800" cy="200" r="1" fill="white" opacity="0.5"/><circle cx="500" cy="100" r="1.5" fill="white" opacity="0.4"/><circle cx="300" cy="600" r="1" fill="white" opacity="0.3"/><circle cx="700" cy="700" r="2" fill="white" opacity="0.4"/></svg>');
+            animation: twinkle 4s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #0066cc;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd23f;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        /* Additional styles for terminology cards */
+        .terminology-card-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        
+        .terminology-card-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 102, 204, 0.3);
+            border-color: #0066cc;
+        }
+        
+        .term-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .terminology-card-item:hover .term-icon {
+            transform: scale(1.1);
+        }
+        
+        .section-title {
+            color: #ffd23f;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .section-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+        }
+        
+        .hero-title {
+            background: linear-gradient(45deg, #ffd23f, #ff6b35, #0066cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+        
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .floating-icon {
+            position: absolute;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-icon:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .floating-icon:nth-child(2) {
+            top: 60%;
+            right: 30%;
+            animation-delay: 2s;
+        }
+        
+        .floating-icon:nth-child(3) {
+            bottom: 20%;
+            left: 40%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .category-filter {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            padding: 0.8rem 1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .category-filter:focus {
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.3);
+            border-color: #0066cc;
+        }
+        
+        .load-more-btn {
+            background: linear-gradient(45deg, #0066cc, #ff6b35);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 102, 204, 0.3);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-rocket me-2"></i>
+                Cosmopedia
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#terminology">
+                            <i class="fas fa-book me-1"></i>Terminologies
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#planets">
+                            <i class="fas fa-globe me-1"></i>Planets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#rockets">
+                            <i class="fas fa-rocket me-1"></i>Rockets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#astronauts">
+                            <i class="fas fa-user-astronaut me-1"></i>Astronauts
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4 hero-title">
+                        Explore the Universe
+                    </h1>
+                    <p class="lead mb-4 hero-subtitle">
+                        Get familiar with space terminologies, discover planets, rockets, and the brave explorers who venture beyond our world.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#terminology" class="btn btn-primary btn-lg me-3 pulse-btn">
+                            <i class="fas fa-book me-2"></i>
+                            Explore Terminologies
+                        </a>
+                        <a href="#search" class="btn btn-outline-light btn-lg search-btn">
+                            <i class="fas fa-search me-2"></i>
+                            Search Space Data
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <i class="fas fa-globe floating-icon"></i>
+                        <i class="fas fa-rocket floating-icon"></i>
+                        <i class="fas fa-satellite floating-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card h-100 text-center glow-on-hover terminology-card" onclick="openTerminologyModal()">
+                        <div class="card-body">
+                            <i class="fas fa-book feature-icon"></i>
+                            <h5 class="card-title">Space Terminologies</h5>
+                            <p class="card-text">Get familiar with space terminologies and expand your cosmic knowledge with detailed explanations.</p>
+                            <a href="#terminology" class="btn btn-primary btn-sm">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 text-center glow-on-hover">
+                        <div class="card-body">
+                            <i class="fas fa-globe feature-icon"></i>
+                            <h5 class="card-title">Planets</h5>
+                            <p class="card-text">Discover planets in our solar system and beyond with scientific data and stunning visuals.</p>
+                            <a href="#planets" class="btn btn-primary btn-sm">Discover</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 text-center glow-on-hover">
+                        <div class="card-body">
+                            <i class="fas fa-rocket feature-icon"></i>
+                            <h5 class="card-title">Rockets</h5>
+                            <p class="card-text">Learn about the powerful rockets that carry us to space, from Saturn V to Falcon Heavy.</p>
+                            <a href="#rockets" class="btn btn-primary btn-sm">Learn</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 text-center glow-on-hover">
+                        <div class="card-body">
+                            <i class="fas fa-user-astronaut feature-icon"></i>
+                            <h5 class="card-title">Astronauts</h5>
+                            <p class="card-text">Meet the brave explorers who venture into space to expand human knowledge.</p>
+                            <a href="#astronauts" class="btn btn-primary btn-sm">Meet</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Space Terminologies Section -->
+    <section id="terminology" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="section-title">
+                        <i class="fas fa-star me-3"></i>
+                        Space Terminologies
+                    </h2>
+                    <p class="section-subtitle">
+                        Explore comprehensive space terminology from A to Z
+                    </p>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            id="searchInput" 
+                            placeholder="Search space terminology... (e.g., 'black hole', 'planet', 'astronaut')"
+                        >
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select category-filter" id="categoryFilter">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Alphabet Filter -->
+            <div class="alphabet-filter mb-4" id="alphabetFilter">
+                <!-- Letters will be populated by JavaScript -->
+            </div>
+
+            <!-- Terminology Cards Grid -->
+            <div class="row" id="terminologyGrid">
+                <!-- Cards will be populated by JavaScript -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-4">
+                <button class="btn btn-outline-primary btn-lg load-more-btn" id="loadMoreBtn" style="display: none;">
+                    <i class="fas fa-plus me-2"></i>
+                    Load More Terms
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Term Detail Modal -->
+    <div class="modal fade" id="termModal" tabindex="-1" aria-labelledby="termModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="termModalLabel">
+                        <i class="fas fa-star me-2"></i>
+                        <span id="modalTermTitle"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <span class="term-category" id="modalCategory"></span>
+                            </div>
+                            <p class="lead mb-3" id="modalShortDescription"></p>
+                            <div id="modalDetailedDescription"></div>
+                            <div class="mt-4" id="modalRelatedTerms"></div>
+                            <div class="mt-4 p-3 bg-info bg-opacity-10 rounded" id="modalFunFact"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <img id="modalImage" class="img-fluid rounded" alt="Term illustration">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="shareTerm()">
+                        <i class="fas fa-share me-2"></i>Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Space Theme JS -->
+    <script src="static/js/space-theme.js"></script>
+    
+    <!-- Main Application JS -->
+    <script>
+        class SpaceTerminologyApp {
+            constructor() {
+                this.terms = [];
+                this.filteredTerms = [];
+                this.currentFilter = '';
+                this.currentSearch = '';
+                this.currentCategory = '';
+                this.alphabetStats = {};
+                this.currentPage = 1;
+                this.termsPerPage = 12;
+                this.categories = [];
+                
+                this.init();
+            }
+
+            async init() {
+                await this.loadAlphabetStats();
+                await this.loadCategories();
+                this.createAlphabetFilter();
+                this.createCategoryFilter();
+                await this.loadTerms();
+                this.setupEventListeners();
+            }
+
+            async loadAlphabetStats() {
+                try {
+                    const response = await fetch('/api/alphabet');
+                    this.alphabetStats = await response.json();
+                } catch (error) {
+                    console.error('Error loading alphabet stats:', error);
+                }
+            }
+
+            async loadCategories() {
+                try {
+                    const response = await fetch('/api/categories');
+                    this.categories = await response.json();
+                } catch (error) {
+                    console.error('Error loading categories:', error);
+                }
+            }
+
+            createAlphabetFilter() {
+                const alphabetContainer = document.getElementById('alphabetFilter');
+                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                
+                // Add "ALL" button
+                const allBtn = document.createElement('button');
+                allBtn.className = 'alphabet-btn active';
+                allBtn.textContent = 'ALL';
+                allBtn.onclick = () => this.filterByLetter('');
+                alphabetContainer.appendChild(allBtn);
+                
+                // Add letter buttons
+                for (let letter of letters) {
+                    const btn = document.createElement('button');
+                    btn.className = 'alphabet-btn';
+                    btn.textContent = letter;
+                    btn.onclick = () => this.filterByLetter(letter);
+                    
+                    const count = this.alphabetStats[letter] || 0;
+                    if (count === 0) {
+                        btn.classList.add('disabled');
+                        btn.disabled = true;
+                    } else {
+                        const countSpan = document.createElement('span');
+                        countSpan.className = 'count';
+                        countSpan.textContent = count;
+                        btn.appendChild(countSpan);
+                    }
+                    
+                    alphabetContainer.appendChild(btn);
+                }
+            }
+
+            createCategoryFilter() {
+                const categorySelect = document.getElementById('categoryFilter');
+                
+                this.categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categorySelect.appendChild(option);
+                });
+            }
+
+            setupEventListeners() {
+                const searchInput = document.getElementById('searchInput');
+                const categoryFilter = document.getElementById('categoryFilter');
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                
+                searchInput.addEventListener('input', (e) => {
+                    this.currentSearch = e.target.value;
+                    this.currentPage = 1;
+                    this.loadTerms();
+                });
+
+                categoryFilter.addEventListener('change', (e) => {
+                    this.currentCategory = e.target.value;
+                    this.currentPage = 1;
+                    this.loadTerms();
+                });
+
+                loadMoreBtn.addEventListener('click', () => {
+                    this.currentPage++;
+                    this.loadTerms(true);
+                });
+
+                // Add keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'f') {
+                        e.preventDefault();
+                        searchInput.focus();
+                    }
+                });
+            }
+
+            async loadTerms(append = false) {
+                if (!append) {
+                    this.showLoading(true);
+                }
+                
+                try {
+                    const params = new URLSearchParams();
+                    if (this.currentFilter) params.append('letter', this.currentFilter);
+                    if (this.currentSearch) params.append('search', this.currentSearch);
+                    
+                    const response = await fetch(`/api/terms?${params}`);
+                    const allTerms = await response.json();
+                    
+                    // Filter by category if selected
+                    let filteredTerms = allTerms;
+                    if (this.currentCategory) {
+                        filteredTerms = allTerms.filter(term => term.category === this.currentCategory);
+                    }
+                    
+                    this.terms = filteredTerms;
+                    this.displayTerms(append);
+                    
+                } catch (error) {
+                    console.error('Error loading terms:', error);
+                    this.showError('Failed to load space terminology. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            displayTerms(append = false) {
+                const container = document.getElementById('terminologyGrid');
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                
+                if (this.terms.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12">
+                            <div class="no-results">
+                                <i class="fas fa-search fa-3x mb-3"></i>
+                                <h3>No terms found</h3>
+                                <p>Try adjusting your search or filter criteria</p>
+                            </div>
+                        </div>
+                    `;
+                    loadMoreBtn.style.display = 'none';
+                    return;
+                }
+                
+                const startIndex = (this.currentPage - 1) * this.termsPerPage;
+                const endIndex = startIndex + this.termsPerPage;
+                const termsToShow = this.terms.slice(0, endIndex);
+                
+                const termsHTML = termsToShow.map((term, index) => {
+                    const icon = this.getTermIcon(term.category);
+                    return `
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 text-center glow-on-hover terminology-card-item" 
+                                 onclick="app.showTermDetails('${term.id}')"
+                                 style="animation-delay: ${(index % 12) * 0.1}s">
+                                <div class="card-body">
+                                    <div class="term-icon mb-3">
+                                        <i class="${icon}"></i>
+                                    </div>
+                                    <h5 class="card-title text-warning">${term.term}</h5>
+                                    <span class="badge bg-primary mb-2">${term.category}</span>
+                                    <p class="card-text">${term.short_description}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                if (append) {
+                    container.innerHTML += termsHTML;
+                } else {
+                    container.innerHTML = termsHTML;
+                }
+                
+                // Show/hide load more button
+                if (endIndex < this.terms.length) {
+                    loadMoreBtn.style.display = 'block';
+                } else {
+                    loadMoreBtn.style.display = 'none';
+                }
+            }
+
+            getTermIcon(category) {
+                const iconMap = {
+                    'Orbital Mechanics': 'fas fa-circle-notch fa-2x text-primary',
+                    'Human Spaceflight': 'fas fa-user-astronaut fa-2x text-info',
+                    'Solar System Objects': 'fas fa-meteor fa-2x text-warning',
+                    'Stellar Physics': 'fas fa-star fa-2x text-success',
+                    'Planetary Science': 'fas fa-globe fa-2x text-primary',
+                    'Astrobiology': 'fas fa-dna fa-2x text-info',
+                    'Space Stations': 'fas fa-satellite fa-2x text-warning',
+                    'Planets': 'fas fa-globe-americas fa-2x text-success',
+                    'Solar System Regions': 'fas fa-solar-panel fa-2x text-primary',
+                    'Units of Measurement': 'fas fa-ruler fa-2x text-info',
+                    'Stellar Objects': 'fas fa-star-of-life fa-2x text-warning',
+                    'Stellar Evolution': 'fas fa-sun fa-2x text-success',
+                    'Stellar Phenomena': 'fas fa-explosion fa-2x text-danger',
+                    'Instruments': 'fas fa-telescope fa-2x text-primary',
+                    'Cosmology': 'fas fa-infinity fa-2x text-info',
+                    'Observational Astronomy': 'fas fa-search fa-2x text-warning',
+                    'Stellar Classification': 'fas fa-star-half-alt fa-2x text-success',
+                    'Positional Astronomy': 'fas fa-crosshairs fa-2x text-primary',
+                    'Atmospheric Phenomena': 'fas fa-cloud fa-2x text-info',
+                    'Cosmic Phenomena': 'fas fa-fire fa-2x text-danger',
+                    'Cosmic Structures': 'fas fa-project-diagram fa-2x text-warning'
+                };
+                return iconMap[category] || 'fas fa-star fa-2x text-primary';
+            }
+
+            filterByLetter(letter) {
+                this.currentFilter = letter;
+                this.currentPage = 1;
+                
+                // Update button states
+                document.querySelectorAll('.alphabet-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if ((letter === '' && btn.textContent === 'ALL') || 
+                        (letter && btn.textContent === letter)) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                this.loadTerms();
+            }
+
+            async showTermDetails(termId) {
+                try {
+                    const response = await fetch(`/api/terms/${termId}`);
+                    const term = await response.json();
+                    
+                    if (term.error) {
+                        this.showError('Term not found');
+                        return;
+                    }
+                    
+                    // Populate modal
+                    document.getElementById('modalTermTitle').textContent = term.term;
+                    document.getElementById('modalCategory').textContent = term.category;
+                    document.getElementById('modalShortDescription').textContent = term.short_description;
+                    document.getElementById('modalDetailedDescription').innerHTML = `
+                        <h6><i class="fas fa-info-circle me-2"></i>Detailed Description:</h6>
+                        <p>${term.detailed_description}</p>
+                    `;
+                    
+                    // Related terms
+                    const relatedTermsHTML = term.related_terms.map(relatedTerm => 
+                        `<span class="badge bg-secondary me-2 mb-2">${relatedTerm}</span>`
+                    ).join('');
+                    document.getElementById('modalRelatedTerms').innerHTML = `
+                        <h6><i class="fas fa-link me-2"></i>Related Terms:</h6>
+                        <div>${relatedTermsHTML}</div>
+                    `;
+                    
+                    // Fun fact
+                    document.getElementById('modalFunFact').innerHTML = `
+                        <h6><i class="fas fa-lightbulb me-2"></i>Fun Fact:</h6>
+                        <p class="mb-0">${term.fun_fact}</p>
+                    `;
+                    
+                    // Image
+                    const modalImage = document.getElementById('modalImage');
+                    modalImage.src = term.image_url;
+                    modalImage.alt = term.term;
+                    
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('termModal'));
+                    modal.show();
+                    
+                } catch (error) {
+                    console.error('Error loading term details:', error);
+                    this.showError('Failed to load term details');
+                }
+            }
+
+            showLoading(show) {
+                // Simple loading indicator
+                const container = document.getElementById('terminologyGrid');
+                if (show) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3">Loading space terminology...</p>
+                        </div>
+                    `;
+                }
+            }
+
+            showError(message) {
+                console.error(message);
+                alert(message);
+            }
+        }
+
+        // Initialize the app
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new SpaceTerminologyApp();
+        });
+
+        // Function to open terminology modal (called from feature card)
+        function openTerminologyModal() {
+            document.getElementById('terminology').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Share functionality
+        function shareTerm() {
+            const termTitle = document.getElementById('modalTermTitle').textContent;
+            const url = window.location.href;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `Space Term: ${termTitle}`,
+                    text: `Learn about ${termTitle} in space terminology`,
+                    url: url
+                });
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(`${termTitle} - ${url}`);
+                alert('Link copied to clipboard!');
+            }
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

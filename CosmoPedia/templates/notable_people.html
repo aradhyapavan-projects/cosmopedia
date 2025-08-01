@@ -1,0 +1,663 @@
+{% extends "base.html" %}
+
+{% block title %}Notable People - Cosmopedia{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding-top: 100px; max-width: 1400px;">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="text-gradient mb-3">
+                    <i class="fas fa-users me-3"></i>Notable People in Space
+                </h1>
+                <p class="lead text-light">Meet the scientists, astrophysicists, and pioneers who shaped our understanding of the universe</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-10">
+            <div class="card bg-glass border-0 p-4">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-0 text-primary">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="personSearch" class="form-control bg-dark border-0 text-light" 
+                                   placeholder="Search notable people..." style="box-shadow: none;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="countryFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Countries</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button id="clearFilters" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-times me-1"></i>Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading notable people...</p>
+    </div>
+
+    <!-- Results Count -->
+    <div id="resultsCount" class="text-center mb-4" style="display: none;">
+        <p class="text-muted" id="peopleCount">Found 0 notable person(s)</p>
+    </div>
+
+    <!-- People Grid -->
+    <div id="peopleGrid" class="row g-4" style="display: none;">
+        <!-- People will be loaded here -->
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="d-flex justify-content-center mt-5" style="display: none;">
+        <nav aria-label="People pagination">
+            <ul class="pagination pagination-lg" id="paginationList">
+                <!-- Pagination will be generated here -->
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <div class="empty-state">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No People Found</h4>
+            <p>Try adjusting your search criteria or filters.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Person Detail Modal -->
+<div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="background: rgba(20, 25, 40, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light" id="personModalLabel">Person Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-light">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img id="modalPersonImage" src="" alt="" class="img-fluid rounded mb-3" style="max-height: 400px; width: 100%; object-fit: contain; object-position: center; background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%); padding: 15px; display: none;" onerror="this.style.display='none'">
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="modalPersonName" class="text-primary mb-3"></h4>
+                        <p id="modalPersonContribution" class="mb-3"></p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <strong class="text-warning">Country:</strong>
+                                <p id="modalPersonCountry"></p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong class="text-warning">Birth Date:</strong>
+                                <p id="modalPersonBirthDate"></p>
+                            </div>
+                        </div>
+                        
+                        <div id="modalPersonDeathDate" class="row mb-3" style="display: none;">
+                            <div class="col-sm-6">
+                                <strong class="text-warning">Death Date:</strong>
+                                <p id="modalPersonDeathDateValue"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong class="text-warning">Known For:</strong>
+                            <p id="modalPersonKnownFor"></p>
+                        </div>
+                        
+                        <div id="modalPersonAwards" class="mb-3" style="display: none;">
+                            <strong class="text-warning">Awards:</strong>
+                            <div id="modalPersonAwardsList"></div>
+                        </div>
+                        
+                        <div id="modalPersonInstitutions" class="mb-3" style="display: none;">
+                            <strong class="text-warning">Institutions:</strong>
+                            <div id="modalPersonInstitutionsList"></div>
+                        </div>
+                        
+                        <div id="modalPersonNotableWorks" class="mb-3" style="display: none;">
+                            <strong class="text-warning">Notable Works:</strong>
+                            <div id="modalPersonNotableWorksList"></div>
+                        </div>
+                        
+                        <div id="modalPersonQuote" class="mb-3" style="display: none;">
+                            <strong class="text-warning">Famous Quote:</strong>
+                            <blockquote class="blockquote">
+                                <p id="modalPersonQuoteText" class="mb-0 fst-italic"></p>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 102, 204, 0.3);
+        border-color: rgba(0, 102, 204, 0.5);
+    }
+    
+    .bg-glass {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .text-gradient {
+        background: linear-gradient(45deg, #ffd23f, #ff6b35);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .person-card {
+        cursor: pointer;
+        height: 100%;
+    }
+    
+    .person-image {
+        height: 220px;
+        object-fit: contain;
+        object-position: center;
+        border-radius: 10px 10px 0 0;
+        width: 100%;
+        background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%);
+        padding: 10px;
+    }
+    
+    .person-image-placeholder {
+        height: 220px;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 10px 10px 0 0;
+        border: 2px dashed #0066cc;
+    }
+    
+    .placeholder-image {
+        opacity: 0.8;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 10px 10px 0 0;
+        border: 2px dashed #0066cc;
+        object-fit: contain;
+        object-position: center;
+        padding: 10px;
+    }
+    
+    .badge-country {
+        background: linear-gradient(45deg, #0066cc, #00ffff);
+        border: none;
+        font-size: 0.75rem;
+    }
+    
+    .empty-state {
+        color: #6c757d;
+    }
+    
+    .award-badge {
+        background: rgba(255, 210, 63, 0.2);
+        color: #ffd23f;
+        border: 1px solid rgba(255, 210, 63, 0.3);
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+        margin: 0.25rem;
+        display: inline-block;
+        font-size: 0.8rem;
+    }
+    
+    .institution-badge {
+        background: rgba(0, 102, 204, 0.2);
+        color: #00ffff;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+        margin: 0.25rem;
+        display: inline-block;
+        font-size: 0.8rem;
+    }
+    
+    .work-badge {
+        background: rgba(255, 107, 53, 0.2);
+        color: #ff6b35;
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+        margin: 0.25rem;
+        display: inline-block;
+        font-size: 0.8rem;
+    }
+    
+    .pagination .page-link {
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: rgba(0, 102, 204, 0.3) !important;
+        border-color: #0066cc !important;
+        color: #fff !important;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #0066cc !important;
+        border-color: #0066cc !important;
+        color: #fff !important;
+    }
+</style>
+
+<script>
+let allPeople = [];
+let filteredPeople = [];
+let currentPage = 1;
+const peoplePerPage = 12; // Show 12 people per page
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadNotablePeople();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    document.getElementById('personSearch').addEventListener('input', () => {
+        currentPage = 1; // Reset to first page when searching
+        filterPeople();
+    });
+    document.getElementById('countryFilter').addEventListener('change', () => {
+        currentPage = 1; // Reset to first page when filtering
+        filterPeople();
+    });
+    document.getElementById('clearFilters').addEventListener('click', clearFilters);
+}
+
+async function loadNotablePeople() {
+    try {
+        showLoadingState();
+        const response = await fetch('/api/notable-people');
+        const people = await response.json();
+        
+        allPeople = people;
+        filteredPeople = [...people];
+        
+        populateCountryFilter();
+        displayPeople();
+        hideLoadingState();
+        
+    } catch (error) {
+        console.error('Error loading notable people:', error);
+        showEmptyState();
+        hideLoadingState();
+    }
+}
+
+function populateCountryFilter() {
+    const countries = [...new Set(allPeople.map(person => person.country))].sort();
+    const countryFilter = document.getElementById('countryFilter');
+    
+    countries.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        countryFilter.appendChild(option);
+    });
+}
+
+function filterPeople() {
+    const searchTerm = document.getElementById('personSearch').value.toLowerCase();
+    const selectedCountry = document.getElementById('countryFilter').value;
+    
+    filteredPeople = allPeople.filter(person => {
+        const matchesSearch = !searchTerm || 
+            person.name.toLowerCase().includes(searchTerm) ||
+            person.contribution.toLowerCase().includes(searchTerm) ||
+            person.known_for.toLowerCase().includes(searchTerm) ||
+            person.country.toLowerCase().includes(searchTerm);
+            
+        const matchesCountry = !selectedCountry || person.country === selectedCountry;
+        
+        return matchesSearch && matchesCountry;
+    });
+    
+    displayPeople();
+}
+
+function clearFilters() {
+    document.getElementById('personSearch').value = '';
+    document.getElementById('countryFilter').value = '';
+    
+    currentPage = 1;
+    filteredPeople = [...allPeople];
+    displayPeople();
+}
+
+function displayPeople() {
+    const grid = document.getElementById('peopleGrid');
+    const countElement = document.getElementById('peopleCount');
+    
+    if (filteredPeople.length === 0) {
+        showEmptyState();
+        hideResultsCount();
+        hidePagination();
+        return;
+    }
+    
+    hideEmptyState();
+    showResultsCount();
+    
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredPeople.length / peoplePerPage);
+    const startIndex = (currentPage - 1) * peoplePerPage;
+    const endIndex = startIndex + peoplePerPage;
+    const currentPeople = filteredPeople.slice(startIndex, endIndex);
+    
+    // Update count display
+    countElement.innerHTML = `
+        <span class="text-primary">${startIndex + 1}-${Math.min(endIndex, filteredPeople.length)}</span> 
+        of <span class="text-primary">${filteredPeople.length}</span> notable person(s)
+    `;
+    
+    // Clear and populate grid
+    grid.innerHTML = '';
+    currentPeople.forEach(person => {
+        const card = createPersonCard(person);
+        grid.appendChild(card);
+    });
+    
+    // Show/update pagination
+    updatePagination(totalPages);
+}
+
+function createPersonCard(person) {
+    const col = document.createElement('div');
+    col.className = 'col-lg-4 col-md-6';
+    
+    const birthYear = person.birth_date ? new Date(person.birth_date).getFullYear() : 'Unknown';
+    const deathYear = person.death_date ? ` - ${new Date(person.death_date).getFullYear()}` : '';
+    const lifespan = `${birthYear}${deathYear}`;
+    
+    col.innerHTML = `
+        <div class="card person-card h-100" onclick="showPersonDetails('${person.name.replace(/'/g, "\\'")}')">
+            ${person.public_image ? 
+                `<img src="${person.public_image}" alt="${person.name}" class="person-image" onerror="this.src='https://via.placeholder.com/300x200/1a1a2e/eee?text=${encodeURIComponent(person.name.split(' ')[0])}'; this.classList.add('placeholder-image');">` : 
+                `<div class="person-image-placeholder d-flex align-items-center justify-content-center">
+                    <div class="text-center">
+                        <i class="fas fa-user-astronaut fa-3x text-primary mb-2"></i>
+                        <div class="small text-muted">${person.name.split(' ')[0]}</div>
+                    </div>
+                </div>`
+            }
+            <div class="card-body">
+                <h5 class="card-title text-primary mb-2">${person.name}</h5>
+                <p class="text-muted small mb-2">${lifespan}</p>
+                <span class="badge badge-country mb-2">${person.country}</span>
+                <p class="card-text mb-3">${person.contribution.substring(0, 120)}${person.contribution.length > 120 ? '...' : ''}</p>
+                <div class="mt-auto">
+                    <strong class="text-warning small">Known for:</strong>
+                    <p class="small text-light mb-0">${person.known_for.substring(0, 80)}${person.known_for.length > 80 ? '...' : ''}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return col;
+}
+
+async function showPersonDetails(personName) {
+    try {
+        // Find person in current data first
+        const person = allPeople.find(p => p.name === personName);
+        
+        if (!person) {
+            console.error('Person not found:', personName);
+            return;
+        }
+        
+        // Populate modal
+        document.getElementById('modalPersonName').textContent = person.name;
+        document.getElementById('modalPersonContribution').textContent = person.contribution;
+        document.getElementById('modalPersonCountry').textContent = person.country;
+        document.getElementById('modalPersonBirthDate').textContent = person.birth_date || 'Unknown';
+        document.getElementById('modalPersonKnownFor').textContent = person.known_for;
+        
+        // Set image
+        const modalImage = document.getElementById('modalPersonImage');
+        if (person.public_image && person.public_image.trim() !== '') {
+            modalImage.src = person.public_image;
+            modalImage.alt = person.name;
+            modalImage.style.display = 'block';
+        } else {
+            modalImage.style.display = 'none';
+        }
+        
+        // Handle death date
+        const deathDateSection = document.getElementById('modalPersonDeathDate');
+        if (person.death_date) {
+            document.getElementById('modalPersonDeathDateValue').textContent = person.death_date;
+            deathDateSection.style.display = 'block';
+        } else {
+            deathDateSection.style.display = 'none';
+        }
+        
+        // Handle awards
+        const awardsSection = document.getElementById('modalPersonAwards');
+        if (person.awards && person.awards.length > 0) {
+            const awardsList = document.getElementById('modalPersonAwardsList');
+            awardsList.innerHTML = person.awards.map(award => 
+                `<span class="award-badge">${award}</span>`
+            ).join('');
+            awardsSection.style.display = 'block';
+        } else {
+            awardsSection.style.display = 'none';
+        }
+        
+        // Handle institutions
+        const institutionsSection = document.getElementById('modalPersonInstitutions');
+        if (person.institutions && person.institutions.length > 0) {
+            const institutionsList = document.getElementById('modalPersonInstitutionsList');
+            institutionsList.innerHTML = person.institutions.map(institution => 
+                `<span class="institution-badge">${institution}</span>`
+            ).join('');
+            institutionsSection.style.display = 'block';
+        } else {
+            institutionsSection.style.display = 'none';
+        }
+        
+        // Handle notable works
+        const worksSection = document.getElementById('modalPersonNotableWorks');
+        if (person.notable_works && person.notable_works.length > 0) {
+            const worksList = document.getElementById('modalPersonNotableWorksList');
+            worksList.innerHTML = person.notable_works.map(work => 
+                `<span class="work-badge">${work}</span>`
+            ).join('');
+            worksSection.style.display = 'block';
+        } else {
+            worksSection.style.display = 'none';
+        }
+        
+        // Handle famous quote
+        const quoteSection = document.getElementById('modalPersonQuote');
+        if (person.famous_quote) {
+            document.getElementById('modalPersonQuoteText').textContent = person.famous_quote;
+            quoteSection.style.display = 'block';
+        } else {
+            quoteSection.style.display = 'none';
+        }
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('personModal'));
+        modal.show();
+        
+    } catch (error) {
+        console.error('Error showing person details:', error);
+    }
+}
+
+function showLoadingState() {
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('peopleGrid').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+}
+
+function hideLoadingState() {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('peopleGrid').style.display = 'flex';
+}
+
+function showEmptyState() {
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('peopleGrid').style.display = 'none';
+}
+
+function hideEmptyState() {
+    document.getElementById('emptyState').style.display = 'none';
+}
+
+function showResultsCount() {
+    document.getElementById('resultsCount').style.display = 'block';
+}
+
+function hideResultsCount() {
+    document.getElementById('resultsCount').style.display = 'none';
+}
+
+function updatePagination(totalPages) {
+    const paginationContainer = document.getElementById('pagination');
+    const paginationList = document.getElementById('paginationList');
+    
+    if (totalPages <= 1) {
+        hidePagination();
+        return;
+    }
+    
+    // Show pagination
+    paginationContainer.style.display = 'block';
+    paginationList.innerHTML = '';
+    
+    // Previous button
+    const prevItem = document.createElement('li');
+    prevItem.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    if (currentPage > 1) {
+        prevItem.innerHTML = `
+            <a class="page-link bg-dark border-secondary text-light" href="#" data-page="${currentPage - 1}">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        `;
+    } else {
+        prevItem.innerHTML = `
+            <span class="page-link bg-dark border-secondary text-muted">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        `;
+    }
+    paginationList.appendChild(prevItem);
+    
+    // Page numbers (simplified - just show 5 pages max)
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, startPage + 4);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageItem = document.createElement('li');
+        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageItem.innerHTML = `
+            <a class="page-link ${i === currentPage ? 'bg-primary border-primary' : 'bg-dark border-secondary text-light'}" 
+               href="#" data-page="${i}">${i}</a>
+        `;
+        paginationList.appendChild(pageItem);
+    }
+    
+    // Next button
+    const nextItem = document.createElement('li');
+    nextItem.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    if (currentPage < totalPages) {
+        nextItem.innerHTML = `
+            <a class="page-link bg-dark border-secondary text-light" href="#" data-page="${currentPage + 1}">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        `;
+    } else {
+        nextItem.innerHTML = `
+            <span class="page-link bg-dark border-secondary text-muted">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        `;
+    }
+    paginationList.appendChild(nextItem);
+    
+    // Add single event listener to pagination container
+    paginationContainer.onclick = function(e) {
+        e.preventDefault();
+        const link = e.target.closest('a[data-page]');
+        if (link) {
+            const page = parseInt(link.getAttribute('data-page'));
+            changePage(page);
+        }
+    };
+}
+
+function changePage(page) {
+    const totalPages = Math.ceil(filteredPeople.length / peoplePerPage);
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    
+    currentPage = page;
+    
+    // Only update the grid and pagination, prevent infinite loop
+    const grid = document.getElementById('peopleGrid');
+    const countElement = document.getElementById('peopleCount');
+    
+    // Calculate pagination
+    const startIndex = (currentPage - 1) * peoplePerPage;
+    const endIndex = startIndex + peoplePerPage;
+    const currentPeople = filteredPeople.slice(startIndex, endIndex);
+    
+    // Update count display
+    countElement.innerHTML = `
+        <span class="text-primary">${startIndex + 1}-${Math.min(endIndex, filteredPeople.length)}</span> 
+        of <span class="text-primary">${filteredPeople.length}</span> notable person(s)
+    `;
+    
+    // Clear and populate grid
+    grid.innerHTML = '';
+    currentPeople.forEach(person => {
+        const card = createPersonCard(person);
+        grid.appendChild(card);
+    });
+    
+    // Update pagination without recursive call
+    updatePagination(totalPages);
+    
+    // Scroll to top of people grid
+    document.getElementById('peopleGrid').scrollIntoView({ behavior: 'smooth' });
+}
+
+function showPagination() {
+    document.getElementById('pagination').style.display = 'block';
+}
+
+function hidePagination() {
+    document.getElementById('pagination').style.display = 'none';
+}
+</script>
+
+{% endblock %}

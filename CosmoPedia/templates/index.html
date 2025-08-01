@@ -1,0 +1,632 @@
+{% extends "base.html" %}
+
+{% block title %}Cosmopedia - Unified Space Data Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom animations for cards */
+    .feature-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        border-color: #0066cc;
+        box-shadow: 0 15px 40px rgba(0, 102, 204, 0.3);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #ffd23f;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1);
+        color: #ff6b35;
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+        padding: 6rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="200" cy="300" r="2" fill="white" opacity="0.3"/><circle cx="800" cy="200" r="1" fill="white" opacity="0.5"/><circle cx="500" cy="100" r="1.5" fill="white" opacity="0.4"/><circle cx="300" cy="600" r="1" fill="white" opacity="0.3"/><circle cx="700" cy="700" r="2" fill="white" opacity="0.4"/></svg>');
+        animation: twinkle 4s ease-in-out infinite;
+    }
+    
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+    }
+    
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0066cc, #ffd23f);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: #e8e8e8;
+        margin-bottom: 2rem;
+    }
+    
+    .pulse-btn {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .stats-section {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 3rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0066cc;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #0066cc, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-title p {
+            color: #999;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h1 class="hero-title">Cosmopedia</h1>
+                    <p class="hero-subtitle mb-4">
+                        Unified data from multiple data sources about space exploration, astronomy, and cosmic discoveries
+                    </p>
+                    
+                    <!-- Documentation and GitHub Buttons -->
+                    <div class="documentation-buttons mb-4">
+                        <button type="button" class="btn btn-outline-info me-3" data-bs-toggle="modal" data-bs-target="#documentationModal">
+                            <i class="fas fa-file-alt me-2"></i>Platform Documentation
+                        </button>
+                        <a href="https://cosmopedia-api-v1-d045176bccfa.herokuapp.com/" target="_blank" class="btn btn-outline-success">
+                            <i class="fas fa-code me-2"></i>API Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="section-title">
+                <h2><i class="fas fa-star me-3"></i>Discover Space</h2>
+                <p>Explore different aspects of space exploration and astronomy</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-book feature-icon"></i>
+                            <h5 class="card-title">Space Terminologies</h5>
+                            <p class="card-text">Learn space-related terms, definitions, and concepts from astronomy and space technology.</p>
+                            <a href="/terminologies" class="btn btn-primary btn-sm">
+                                <i class="fas fa-search me-1"></i>Explore
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-building feature-icon"></i>
+                            <h5 class="card-title">Space Agencies</h5>
+                            <p class="card-text">Discover space agencies worldwide - government, private, and international organizations.</p>
+                            <a href="/agencies" class="btn btn-primary btn-sm">
+                                <i class="fas fa-globe me-1"></i>Explore
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-globe feature-icon"></i>
+                            <h5 class="card-title">Planets</h5>
+                            <p class="card-text">Discover planets in our solar system with scientific data and stunning visuals.</p>
+                            <a href="/planets" class="btn btn-primary btn-sm">
+                                <i class="fas fa-globe me-1"></i>Discover
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-rocket feature-icon"></i>
+                            <h5 class="card-title">Rockets</h5>
+                            <p class="card-text">Learn about the powerful rockets that carry us to space, from Saturn V to Falcon Heavy.</p>
+                            <a href="/rockets" class="btn btn-primary btn-sm">
+                                <i class="fas fa-rocket me-1"></i>Explore
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-user-astronaut feature-icon"></i>
+                            <h5 class="card-title">Astronauts</h5>
+                            <p class="card-text">Meet the brave explorers who venture into space to expand human knowledge.</p>
+                            <a href="/astronauts" class="btn btn-primary btn-sm">
+                                <i class="fas fa-user-astronaut me-1"></i>Meet Them
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-binoculars feature-icon"></i>
+                            <h5 class="card-title">Telescopes</h5>
+                            <p class="card-text">Discover the instruments that reveal the universe, from ancient optical telescopes to modern space observatories.</p>
+                            <a href="/telescopes" class="btn btn-primary btn-sm">
+                                <i class="fas fa-binoculars me-1"></i>Explore
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-images feature-icon"></i>
+                            <h5 class="card-title">Space Images</h5>
+                            <p class="card-text">Explore stunning space images from NASA and other space agencies around the world.</p>
+                            <a href="/images" class="btn btn-primary btn-sm">
+                                <i class="fas fa-images me-1"></i>View Gallery
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-brain feature-icon"></i>
+                            <h5 class="card-title">AI Chat</h5>
+                            <p class="card-text">Chat with our AI assistant about space exploration, powered by advanced RAG technology.</p>
+                            <a href="/chat" class="btn btn-primary btn-sm">
+                                <img src="https://img.icons8.com/ios-filled/50/artificial-intelligence.png" alt="AI" style="width: 16px; height: 16px; filter: brightness(0) invert(1); margin-right: 0.25rem; vertical-align: middle;"> Start Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-users feature-icon"></i>
+                            <h5 class="card-title">Notable People</h5>
+                            <p class="card-text">Meet the scientists, astrophysicists, and space pioneers who contributed to our understanding of the universe.</p>
+                            <a href="/notable-people" class="btn btn-primary btn-sm">
+                                <i class="fas fa-star me-1"></i>Discover
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 text-center feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-university feature-icon"></i>
+                            <h5 class="card-title">Space Museums</h5>
+                            <p class="card-text">Explore the world's most fascinating space museums and planetariums from around the globe.</p>
+                            <a href="/museums" class="btn btn-primary btn-sm">
+                                <i class="fas fa-university me-1"></i>Visit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section" id="stats">
+        <div class="container">
+            <div class="section-title">
+                <h2><i class="fas fa-chart-line me-3"></i>Space Data by Numbers</h2>
+                <p>Comprehensive statistics from our unified space information database</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-2">
+                    <div class="stat-item">
+                        <span class="stat-number" id="terminologyCount">330</span>
+                        <span class="stat-label">Terminologies</span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="stat-item">
+                        <span class="stat-number" id="agenciesCount">12</span>
+                        <span class="stat-label">Space Agencies</span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="stat-item">
+                        <span class="stat-number" id="planetsCount">8</span>
+                        <span class="stat-label">Planets</span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="stat-item">
+                        <span class="stat-number" id="rocketsCount">25</span>
+                        <span class="stat-label">Rockets</span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="stat-item">
+                        <span class="stat-number" id="astronautsCount">41</span>
+                        <span class="stat-label">Astronauts</span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="stat-item">
+                        <span class="stat-number" id="telescopesCount">15</span>
+                        <span class="stat-label">Telescopes</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-4 mt-3">
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number" id="notablePeopleCount">50</span>
+                        <span class="stat-label">Notable People</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number" id="museumsCount">75</span>
+                        <span class="stat-label">Space Museums</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalCountries">25</span>
+                        <span class="stat-label">Countries</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalDataPoints">500+</span>
+                        <span class="stat-label">Data Points</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <small>Data is continuously updated with more public datasets and sources</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Contributors -->
+    <section class="py-5" id="contributors">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2><i class="fas fa-users me-3"></i>Project Contributors</h2>
+                <p>Meet the talented team behind this project</p>
+            </div>
+            
+            <div class="row justify-content-center g-4">
+                <div class="col-md-4">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="contributor-icon mb-3">
+                                <i class="fas fa-code" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            </div>
+                            <h5 class="card-title">Aradhya Pavan H S</h5>
+                            <p class="card-text text-muted">Full Stack Web Developer</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="contributor-icon mb-3">
+                                <i class="fas fa-cogs" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                            </div>
+                            <h5 class="card-title">Aradhya Puneeth H S</h5>
+                            <p class="card-text text-muted">DevOps Engineer</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="contributor-icon mb-3">
+                                <i class="fas fa-palette" style="font-size: 3rem; color: var(--accent-color);"></i>
+                            </div>
+                            <h5 class="card-title">Sanjay Aradhya</h5>
+                            <p class="card-text text-muted">Creative and Design</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Modal -->
+    <div class="modal fade" id="documentationModal" tabindex="-1" aria-labelledby="documentationModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title" id="documentationModalLabel">
+              <i class="fas fa-book-open me-2"></i> Cosmopedia Documentation
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body documentation-content">
+            <div class="row g-4">
+              <!-- Left Column -->
+              <div class="col-md-7">
+                <h6 class="mb-2"><i class="fas fa-globe me-2"></i> What is Cosmopedia?</h6>
+                <p>Cosmopedia is a unified, open-access space knowledge platform for everyone—students, professionals, and enthusiasts. Our mission is to empower you with the knowledge and tools to explore, learn, and stay updated on the universe and space exploration.</p>
+                <ul class="mb-3">
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Space Terminologies</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Space Agencies</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Planets</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Rockets</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Astronauts</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Telescopes</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Space Images</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> AI Chat</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Notable People</li>
+                  <li><span class="text-success"><i class="fas fa-check-circle me-1"></i></span> Space Museums</li>
+                </ul>
+                <div class="alert alert-info py-2 px-3 mb-3">
+                  <i class="fas fa-code-branch me-2"></i> <strong>Open Source:</strong> All data is open and accessible for learning, research, and building your own applications.
+                </div>
+                <h6 class="mb-2"><i class="fas fa-rocket me-2"></i> How Cosmopedia Helps You</h6>
+                <ul>
+                  <li>Learn space concepts, discoveries, and missions</li>
+                  <li>Implement best practices and digital exploration</li>
+                  <li>Stay updated with tools, roles, and protocols</li>
+                  <li>Access open data for your own projects</li>
+                  <li>Raise awareness and build a more informed society</li>
+                </ul>
+              </div>
+              <!-- Right Column -->
+              <div class="col-md-5">
+                <div class="mb-3">
+                  <h6 class="mb-2"><i class="fas fa-compass me-2"></i> Navigation Guide</h6>
+                  <div class="mb-2">
+                    <span class="badge bg-primary me-1">Terminologies</span>
+                    <span class="badge bg-success me-1">Agencies</span>
+                    <span class="badge bg-info me-1">Planets</span>
+                    <span class="badge bg-warning me-1">Rockets</span>
+                    <span class="badge bg-secondary me-1">Astronauts</span>
+                    <span class="badge bg-primary me-1">Telescopes</span>
+                    <span class="badge bg-success me-1">Museums</span>
+                    <span class="badge bg-info me-1">Notable People</span>
+                    <span class="badge bg-warning me-1">Images</span>
+                    <span class="badge bg-secondary me-1">AI Chat</span>
+                    <span class="badge bg-primary me-1">Comets</span>
+                    <span class="badge bg-success me-1">Satellites</span>
+                    <span class="badge bg-info me-1">Solar System</span>
+                    <span class="badge bg-warning me-1">Events</span>
+                  </div>
+                  <div class="alert alert-warning py-2 px-3 mb-2">
+                    <i class="fas fa-code me-2"></i> <strong>Unified API (Coming Soon):</strong> Access all Cosmopedia data programmatically to build your own apps, dashboards, or research projects.
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <h6 class="mb-2"><i class="fas fa-lightbulb me-2"></i> Future Enhancements</h6>
+                  <ul class="mb-2">
+                    <li><span class="text-primary"><i class="fas fa-meteor me-1"></i></span> Comets & Asteroids explorer</li>
+                    <li><span class="text-success"><i class="fas fa-satellite me-1"></i></span> Satellites & space probes</li>
+                    <li><span class="text-info"><i class="fas fa-sun me-1"></i></span> Solar system & exoplanet data</li>
+                    <li><span class="text-warning"><i class="fas fa-calendar-alt me-1"></i></span> Real & upcoming astronomical events</li>
+                    <li><span class="text-secondary"><i class="fas fa-calendar-check me-1"></i></span> Space launches & mission timelines</li>
+                    <li><span class="text-primary"><i class="fas fa-users me-1"></i></span> Community Q&A & expert contributions</li>
+                    <li><span class="text-success"><i class="fas fa-sync-alt me-1"></i></span> Continuous data updates & new resource types</li>
+                  </ul>
+                  <div class="alert alert-light py-2 px-3">
+                    <i class="fas fa-comment-dots me-2"></i> <strong>Have ideas?</strong> Suggest features or contribute to make Cosmopedia better for all.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        // Load all statistics dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllStats();
+        });
+
+        async function loadAllStats() {
+            try {
+                // Load all counts in parallel
+                const [
+                    termsResponse,
+                    agenciesResponse,
+                    planetsResponse,
+                    rocketsResponse,
+                    astronautsResponse,
+                    telescopesResponse,
+                    notablePeopleResponse,
+                    museumsResponse
+                ] = await Promise.all([
+                    fetch('/api/terms'),
+                    fetch('/api/agencies'),
+                    fetch('/api/planets'),
+                    fetch('/api/rockets'),
+                    fetch('/api/astronauts'),
+                    fetch('/api/telescopes'),
+                    fetch('/api/notable-people'),
+                    fetch('/api/museums')
+                ]);
+
+                // Update counts
+                const terms = await termsResponse.json();
+                const agencies = await agenciesResponse.json();
+                const planets = await planetsResponse.json();
+                const rockets = await rocketsResponse.json();
+                const astronauts = await astronautsResponse.json();
+                const telescopes = await telescopesResponse.json();
+                const notablePeople = await notablePeopleResponse.json();
+                const museums = await museumsResponse.json();
+
+                // Update DOM elements
+                document.getElementById('terminologyCount').textContent = terms.length;
+                document.getElementById('agenciesCount').textContent = agencies.length;
+                document.getElementById('planetsCount').textContent = planets.length;
+                document.getElementById('rocketsCount').textContent = rockets.length;
+                document.getElementById('astronautsCount').textContent = astronauts.length;
+                document.getElementById('telescopesCount').textContent = telescopes.length;
+                document.getElementById('notablePeopleCount').textContent = notablePeople.length;
+                document.getElementById('museumsCount').textContent = museums.total || museums.length;
+
+                // Calculate total countries (unique countries across all datasets)
+                const allCountries = new Set();
+                
+                // Add countries from agencies
+                agencies.forEach(agency => allCountries.add(agency.country));
+                
+                // Add countries from astronauts
+                astronauts.forEach(astronaut => allCountries.add(astronaut.country));
+                
+                // Add countries from telescopes
+                telescopes.forEach(telescope => allCountries.add(telescope.country));
+                
+                // Add countries from notable people
+                notablePeople.forEach(person => allCountries.add(person.country));
+                
+                // Add countries from museums
+                if (museums.items) {
+                    museums.items.forEach(museum => allCountries.add(museum.country));
+                } else {
+                    museums.forEach(museum => allCountries.add(museum.country));
+                }
+
+                document.getElementById('totalCountries').textContent = allCountries.size;
+
+                // Calculate total data points
+                const totalDataPoints = terms.length + agencies.length + planets.length + 
+                                      rockets.length + astronauts.length + telescopes.length + 
+                                      notablePeople.length + (museums.total || museums.length);
+                document.getElementById('totalDataPoints').textContent = totalDataPoints + '+';
+
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                // Fallback to default values if API calls fail
+            }
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

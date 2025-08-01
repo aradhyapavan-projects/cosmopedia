@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+
+{% block title %}Solar System Planets - Cosmopedia{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding-top: 100px; max-width: 1400px;">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="text-gradient mb-3">
+                    <i class="fas fa-globe me-3"></i>Solar System Planets
+                </h1>
+                <p class="lead text-light">Explore the eight planets of our solar system</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="row mb-5 justify-content-center">
+        <div class="col-lg-8">
+            <div class="card bg-glass border-0 p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-0 text-primary">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="planetSearch" class="form-control bg-dark border-0 text-light" 
+                                   placeholder="Search planets..." style="box-shadow: none;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="typeFilter" class="form-select bg-dark border-0 text-light">
+                            <option value="">All Types</option>
+                            <option value="Terrestrial">Terrestrial</option>
+                            <option value="Gas Giant">Gas Giant</option>
+                            <option value="Ice Giant">Ice Giant</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="clearFilters" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-times me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading planets...</p>
+    </div>
+
+    <!-- Results Count -->
+    <div id="resultsCount" class="text-center mb-4" style="display: none;">
+        <p class="text-muted">Found <span id="planetCount">0</span> planet(s)</p>
+    </div>
+
+    <!-- Planets Grid -->
+    <div id="planetsGrid" class="row g-4" style="display: none;">
+        <!-- Planets will be loaded here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-5" style="display: none;">
+        <div class="empty-state">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No Planets Found</h4>
+            <p>Try adjusting your search criteria or filters.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Planet Detail Modal -->
+<div class="modal fade" id="planetModal" tabindex="-1" aria-labelledby="planetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: rgba(20, 25, 40, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light" id="planetModalLabel">Planet Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-light">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="planet-image-container" style="height: 250px; position: relative; overflow: hidden;">
+                            <img id="modalPlanetImage" src="" alt="" class="img-fluid rounded" style="max-height: 250px; width: 100%; object-fit: cover; position: absolute; top: 0; left: 0; display: none;">
+                            <div id="modalImageFallback" class="d-flex align-items-center justify-content-center bg-glass rounded" style="height: 100%; width: 100%; position: absolute; top: 0; left: 0; display: none;">
+                                <i class="fas fa-globe fa-3x text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="modalPlanetName" class="text-primary mb-3"></h4>
+                        <p id="modalPlanetDescription" class="mb-3"></p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Type:</strong>
+                                <span id="modalPlanetType" class="badge bg-primary ms-2"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Distance from Sun:</strong>
+                                <span id="modalPlanetDistance"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Diameter:</strong>
+                                <span id="modalPlanetDiameter"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Moons:</strong>
+                                <span id="modalPlanetMoons"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Orbital Period:</strong>
+                                <span id="modalPlanetOrbital"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Rotation Period:</strong>
+                                <span id="modalPlanetRotation"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Surface Temperature:</strong>
+                            <span id="modalPlanetTemperature"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Atmosphere:</strong>
+                            <span id="modalPlanetAtmosphere"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="text-primary">Key Features</h6>
+                    <ul id="modalPlanetFeatures" class="list-unstyled">
+                        <!-- Features will be loaded here -->
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="text-primary">Interesting Facts</h6>
+                    <ul id="modalPlanetFacts" class="list-unstyled">
+                        <!-- Facts will be loaded here -->
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h6 class="text-primary">Exploration Missions</h6>
+                    <ul id="modalPlanetExploration" class="list-unstyled">
+                        <!-- Exploration missions will be loaded here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allPlanets = [];
+let filteredPlanets = [];
+
+// Load planets data
+async function loadPlanets() {
+    try {
+        const response = await fetch('/api/planets');
+        const data = await response.json();
+        allPlanets = data;  // API returns the array directly
+        filteredPlanets = [...allPlanets];
+        
+        // Hide loading, show content
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('planetsGrid').style.display = 'flex';
+        document.getElementById('planetsGrid').style.flexWrap = 'wrap';
+        document.getElementById('resultsCount').style.display = 'block';
+        
+        renderPlanets();
+    } catch (error) {
+        console.error('Error loading planets:', error);
+        document.getElementById('loadingState').innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h4>Error Loading Planets</h4>
+                <p>Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+// Render planets grid
+function renderPlanets() {
+    const grid = document.getElementById('planetsGrid');
+    const countElement = document.getElementById('planetCount');
+    const emptyState = document.getElementById('emptyState');
+    
+    countElement.textContent = filteredPlanets.length;
+    
+    if (filteredPlanets.length === 0) {
+        grid.style.display = 'none';
+        emptyState.style.display = 'block';
+        document.getElementById('resultsCount').style.display = 'none';
+        return;
+    }
+    
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    emptyState.style.display = 'none';
+    document.getElementById('resultsCount').style.display = 'block';
+    
+    grid.innerHTML = filteredPlanets.map(planet => `
+        <div class="col-4">
+            <div class="card planet-card glow-on-hover h-100" onclick="showPlanetDetails('${planet.id}')" style="cursor: pointer; min-height: 500px;">
+                <div class="position-relative">
+                    <img src="${planet.image_url}" 
+                         class="card-img-top planet-image" 
+                         alt="${planet.name}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                         style="height: 220px; object-fit: cover; border-radius: 12px 12px 0 0;">
+                    <div class="d-none align-items-center justify-content-center bg-glass" style="height: 220px; border-radius: 12px 12px 0 0;">
+                        <i class="fas fa-globe fa-3x text-muted"></i>
+                    </div>
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge bg-primary fs-6">${planet.type}</span>
+                    </div>
+                </div>
+                
+                <div class="card-body d-flex flex-column p-4">
+                    <h5 class="card-title text-center mb-3 text-primary">${planet.name}</h5>
+                    <p class="card-text flex-grow-1 text-light mb-3">${planet.description ? planet.description.substring(0, 85) + '...' : 'Discover this fascinating planet in our solar system.'}</p>
+                    
+                    <div class="planet-stats mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-ruler me-1"></i>Distance:
+                            </small>
+                            <small class="text-light">${planet.distance_from_sun}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-moon me-1"></i>Moons:
+                            </small>
+                            <small class="text-light">${planet.moons}</small>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-sm mt-auto">
+                        <i class="fas fa-info-circle me-1"></i>Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Show planet details in modal
+function showPlanetDetails(planetId) {
+    const planet = allPlanets.find(p => p.id === planetId);
+    if (!planet) return;
+    
+    // Set modal content
+    document.getElementById('modalPlanetName').textContent = planet.name;
+    document.getElementById('modalPlanetDescription').textContent = planet.description || 'No description available.';
+    document.getElementById('modalPlanetType').textContent = planet.type || 'Unknown';
+    document.getElementById('modalPlanetDistance').textContent = planet.distance_from_sun || 'Unknown';
+    document.getElementById('modalPlanetDiameter').textContent = planet.diameter || 'Unknown';
+    document.getElementById('modalPlanetMoons').textContent = planet.moons || '0';
+    document.getElementById('modalPlanetOrbital').textContent = planet.orbital_period || 'Unknown';
+    document.getElementById('modalPlanetRotation').textContent = planet.rotation_period || 'Unknown';
+    document.getElementById('modalPlanetTemperature').textContent = planet.surface_temperature || 'Unknown';
+    document.getElementById('modalPlanetAtmosphere').textContent = planet.atmosphere || 'Unknown';
+    
+    // Set image with fallback
+    const modalImage = document.getElementById('modalPlanetImage');
+    const modalImageFallback = document.getElementById('modalImageFallback');
+    
+    // Reset both elements first - ensure complete hiding
+    modalImage.style.display = 'none';
+    modalImage.style.visibility = 'hidden';
+    modalImageFallback.style.display = 'none';
+    modalImageFallback.style.visibility = 'hidden';
+    
+    if (planet.image_url && planet.image_url.trim()) {
+        modalImage.src = planet.image_url;
+        modalImage.alt = planet.name;
+        
+        modalImage.onload = function() {
+            // Show image, completely hide fallback
+            modalImage.style.display = 'block';
+            modalImage.style.visibility = 'visible';
+            modalImageFallback.style.display = 'none';
+            modalImageFallback.style.visibility = 'hidden';
+        };
+        
+        modalImage.onerror = function() {
+            // Hide image, show fallback
+            modalImage.style.display = 'none';
+            modalImage.style.visibility = 'hidden';
+            modalImageFallback.style.display = 'flex';
+            modalImageFallback.style.visibility = 'visible';
+        };
+        
+        // Trigger load check
+        if (modalImage.complete) {
+            modalImage.onload();
+        }
+    } else {
+        // No image URL, show fallback
+        modalImage.style.display = 'none';
+        modalImage.style.visibility = 'hidden';
+        modalImageFallback.style.display = 'flex';
+        modalImageFallback.style.visibility = 'visible';
+    }
+    
+    // Set features
+    const featuresElement = document.getElementById('modalPlanetFeatures');
+    if (planet.key_features && planet.key_features.length > 0) {
+        featuresElement.innerHTML = planet.key_features.map(feature => 
+            `<li><i class="fas fa-star text-warning me-2"></i>${feature}</li>`
+        ).join('');
+    } else {
+        featuresElement.innerHTML = '<li class="text-muted">No features listed</li>';
+    }
+    
+    // Set facts
+    const factsElement = document.getElementById('modalPlanetFacts');
+    if (planet.interesting_facts && planet.interesting_facts.length > 0) {
+        factsElement.innerHTML = planet.interesting_facts.map(fact => 
+            `<li><i class="fas fa-lightbulb text-info me-2"></i>${fact}</li>`
+        ).join('');
+    } else {
+        factsElement.innerHTML = '<li class="text-muted">No facts available</li>';
+    }
+    
+    // Set exploration missions
+    const explorationElement = document.getElementById('modalPlanetExploration');
+    if (planet.exploration && planet.exploration.length > 0) {
+        explorationElement.innerHTML = planet.exploration.map(mission => 
+            `<li><i class="fas fa-rocket text-success me-2"></i>${mission}</li>`
+        ).join('');
+    } else {
+        explorationElement.innerHTML = '<li class="text-muted">No exploration missions listed</li>';
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('planetModal'));
+    modal.show();
+}
+
+// Filter and search functionality
+function applyFilters() {
+    const searchTerm = document.getElementById('planetSearch').value.toLowerCase();
+    const typeFilter = document.getElementById('typeFilter').value;
+    
+    filteredPlanets = allPlanets.filter(planet => {
+        const matchesSearch = !searchTerm || 
+            planet.name.toLowerCase().includes(searchTerm) ||
+            (planet.description && planet.description.toLowerCase().includes(searchTerm)) ||
+            (planet.type && planet.type.toLowerCase().includes(searchTerm));
+        
+        const matchesType = !typeFilter || planet.type === typeFilter;
+        
+        return matchesSearch && matchesType;
+    });
+    
+    renderPlanets();
+}
+
+// Event listeners
+document.getElementById('planetSearch').addEventListener('input', applyFilters);
+document.getElementById('typeFilter').addEventListener('change', applyFilters);
+document.getElementById('clearFilters').addEventListener('click', () => {
+    document.getElementById('planetSearch').value = '';
+    document.getElementById('typeFilter').value = '';
+    applyFilters();
+});
+
+// Load planets on page load
+document.addEventListener('DOMContentLoaded', loadPlanets);
+</script>
+
+<style>
+#planetsGrid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+}
+
+.col-4 {
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+    margin-bottom: 24px !important;
+}
+
+.planet-card {
+    background: rgba(20, 25, 40, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.planet-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 123, 255, 0.3);
+    border-color: rgba(0, 123, 255, 0.5);
+}
+
+.planet-image {
+    height: 220px;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+}
+
+.planet-stats {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-glass {
+    background: rgba(20, 25, 40, 0.7);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.form-control.bg-dark::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-select.bg-dark option {
+    background: rgba(20, 25, 40, 0.95);
+    color: white;
+}
+
+.empty-state {
+    padding: 4rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.text-gradient {
+    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glow-on-hover:hover {
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Card improvements */
+.card-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.badge.fs-6 {
+    font-size: 0.875rem !important;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.btn-outline-primary {
+    border: 2px solid #007bff;
+    color: #007bff;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: #007bff;
+    border-color: #007bff;
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
